@@ -17,6 +17,10 @@ namespace Cogworks.Game
     ///   -cw-demo                      # single-player sandbox with a small working factory
     ///   -cw-shots dir                 # with -cw-demo: screenshot the world and each panel, then quit
     ///   -cw-menushots dir             # screenshot the main menu, help and settings, then quit
+    ///   -cw-demo (with host)          # host the demo factory in a sandbox world
+    ///   -cw-wander                    # walk the local avatar around the factory (showcase captures)
+    ///   -cw-shots dir (host/client)   # after players join, screenshot this player's view, then quit
+    ///   -cw-frames dir                # with -cw-demo: save ~4 s of frames for an animated GIF, then quit
     /// </code>
     /// Comparing the logs from a host and its clients proves they ran identical simulations.
     /// </summary>
@@ -34,6 +38,9 @@ namespace Cogworks.Game
         StreamWriter _log;
         Simulation _loggedSim;
         bool _active;
+        bool _wander;
+        Vector2 _wanderCentre;
+        bool _wanderCentreFound;
 
         void Start()
         {
@@ -55,10 +62,23 @@ namespace Cogworks.Game
             Application.runInBackground = true;
             Application.targetFrameRate = 60;
 
+            _wander = args.ContainsKey("-cw-wander");
+            args.TryGetValue("-cw-shots", out string shotDir);
             switch (mode)
             {
-                case "host": game.HostLan(new Simulation(seed, sandbox: args.ContainsKey("-cw-sandbox")), port); break;
-                case "client": game.JoinLan(ip, port); break;
+                case "host":
+                {
+                    bool hostDemo = args.ContainsKey("-cw-demo");
+                    var hostSim = new Simulation(seed, sandbox: hostDemo || args.ContainsKey("-cw-sandbox"));
+                    if (hostDemo) DemoScenario.Build(hostSim);
+                    game.HostLan(hostSim, port);
+                    if (shotDir != null) StartCoroutine(DemoScenario.CaptureMultiplayerShots(shotDir, "host", cameraRig, 16f));
+                    break;
+                }
+                case "client":
+                    game.JoinLan(ip, port);
+                    if (shotDir != null) StartCoroutine(DemoScenario.CaptureMultiplayerShots(shotDir, "client", cameraRig, 13f));
+                    break;
                 default:
                     bool demo = args.ContainsKey("-cw-demo");
                     var sim = new Simulation(seed, sandbox: demo);
@@ -69,8 +89,10 @@ namespace Cogworks.Game
                         var avatar = FindAnyObjectByType<PlayerAvatar>();
                         if (avatar != null) avatar.transform.position = new Vector3(focus.x, focus.y, 0f);
                     }
-                    if (demo && args.TryGetValue("-cw-shots", out string shots))
-                        StartCoroutine(DemoScenario.CaptureShots(shots, bootstrap, panels, cameraRig));
+                    if (demo && shotDir != null)
+                        StartCoroutine(DemoScenario.CaptureShots(shotDir, bootstrap, panels, cameraRig));
+                    if (demo && args.TryGetValue("-cw-frames", out string frames))
+                        StartCoroutine(DemoScenario.CaptureFrames(frames, cameraRig));
                     break;
             }
             _startTime = Time.realtimeSinceStartup;
@@ -92,6 +114,8 @@ namespace Cogworks.Game
                 }
             }
 
+            if (_wander) Wander(sim);
+
             if (_autotestSeconds <= 0) return;
             float elapsed = Time.realtimeSinceStartup - _startTime;
             if (sim != null && elapsed < _autotestSeconds && _rng.Range(0, 4) == 0) bootstrap.Commands.Submit(RandomCommand());
@@ -106,6 +130,35 @@ namespace Cogworks.Game
                 game.Leave();
                 Application.Quit();
             }
+        }
+
+        /// <summary>
+        /// Showcase helper: walk the local avatar in a loop near the factory (found from the world, so clients
+        /// can do it too), each player on its own path. Movement replicates like normal play.
+        /// </summary>
+        void Wander(Simulation sim)
+        {
+            if (sim == null) return;
+            PlayerAvatar local = null;
+            foreach (var a in FindObjectsByType<PlayerAvatar>(FindObjectsInactive.Exclude))
+                if (a.Controller.IsLocal) local = a;
+            if (local == null) return;
+            if (!_wanderCentreFound)
+            {
+                foreach (var b in sim.World.Buildings.All)
+                {
+                    if (b.Spec != BuildingCatalog.Lab) continue;
+                    _wanderCentre = new Vector2(b.Origin.X + 1f, b.Origin.Y - 1.5f);
+                    _wanderCentreFound = true;
+                    break;
+                }
+                if (!_wanderCentreFound) return;
+            }
+            int id = bootstrap.LocalPlayerId;
+            float t = Time.time * 0.6f + id * 1.7f;
+            float r = 2.5f + id * 0.9f;
+            var target = _wanderCentre + new Vector2(Mathf.Cos(t) * r * 1.4f, Mathf.Sin(t) * r * 0.8f);
+            local.transform.position = Vector3.MoveTowards(local.transform.position, target, 6f * Time.deltaTime);
         }
 
         void OnStepped(long tick)

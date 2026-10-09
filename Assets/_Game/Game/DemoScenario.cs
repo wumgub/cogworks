@@ -172,6 +172,51 @@ namespace Cogworks.Game
             Application.Quit();
         }
 
+        /// <summary>Multiplayer showcase: waits for everyone to join and wander, then screenshots this view.</summary>
+        public static IEnumerator CaptureMultiplayerShots(string dir, string role, CameraRig rig, float delaySeconds)
+        {
+            Directory.CreateDirectory(dir);
+            var (cam, worldRT, uiRT) = SetupOffscreen(rig);
+            rig.SetZoom(1);
+            yield return Wait(delaySeconds);
+            yield return Shot(Path.Combine(dir, $"mp_{role}_{System.Diagnostics.Process.GetCurrentProcess().Id}.png"), cam, worldRT, uiRT);
+            rig.SetZoom(2);
+            yield return Wait(0.5f);
+            yield return Shot(Path.Combine(dir, $"mp_{role}_{System.Diagnostics.Process.GetCurrentProcess().Id}_wide.png"), cam, worldRT, uiRT);
+            yield return Wait(role == "host" ? 4f : 0.5f);
+            Application.Quit();
+        }
+
+        /// <summary>Saves frames of the running factory (every other frame for ~4 s) for building a GIF.</summary>
+        public static IEnumerator CaptureFrames(string dir, CameraRig rig)
+        {
+            Directory.CreateDirectory(dir);
+            var (cam, worldRT, uiRT) = SetupOffscreen(rig);
+            rig.SetZoom(0);
+            yield return Wait(6f);
+            for (int i = 0; i < 120; i++)
+            {
+                yield return null;
+                if (i % 2 == 0) yield return Shot(Path.Combine(dir, $"frame_{i / 2:000}.png"), cam, worldRT, uiRT, hideUi: true);
+            }
+            Application.Quit();
+        }
+
+        static (Camera, RenderTexture, RenderTexture) SetupOffscreen(CameraRig rig)
+        {
+            var cam = rig.GetComponent<Camera>();
+            var worldRT = new RenderTexture(1280, 720, 24, RenderTextureFormat.ARGB32);
+            var uiRT = new RenderTexture(1280, 720, 24, RenderTextureFormat.ARGB32);
+            cam.targetTexture = worldRT;
+            foreach (var doc in Object.FindObjectsByType<UnityEngine.UIElements.UIDocument>(FindObjectsInactive.Exclude))
+            {
+                doc.panelSettings.targetTexture = uiRT;
+                doc.panelSettings.clearColor = true;
+                doc.panelSettings.colorClearValue = new Color(0, 0, 0, 0);
+            }
+            return (cam, worldRT, uiRT);
+        }
+
         // Frame-counted rather than wall-clock so throttled or headless players still progress.
         static IEnumerator Wait(float seconds)
         {
@@ -179,12 +224,13 @@ namespace Cogworks.Game
             for (int i = 0; i < frames; i++) yield return null;
         }
 
-        static IEnumerator Shot(string path, Camera cam, RenderTexture worldRT, RenderTexture uiRT)
+        static IEnumerator Shot(string path, Camera cam, RenderTexture worldRT, RenderTexture uiRT, bool hideUi = false)
         {
             yield return null;
             cam.Render();
             var world = Read(worldRT);
-            var ui = Read(uiRT);
+            var ui = hideUi ? new Texture2D(world.width, world.height, TextureFormat.RGBA32, false) : Read(uiRT);
+            if (hideUi) ui.SetPixels32(new Color32[world.width * world.height]);
             var a = world.GetPixels32();
             var b = ui.GetPixels32();
             for (int i = 0; i < a.Length; i++)
