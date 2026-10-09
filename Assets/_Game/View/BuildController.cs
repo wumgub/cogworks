@@ -120,7 +120,7 @@ namespace Cogworks.View
             Vector3 w = worldCamera.ScreenToWorldPoint(new Vector3(screen.x, screen.y, -worldCamera.transform.position.z));
             var cursor = new Int2(Mathf.FloorToInt(w.x), Mathf.FloorToInt(w.y));
             CursorTile = cursor;
-            Hovered = overUi ? null : bootstrap.Sim.World.Buildings.GetAt(cursor);
+            Hovered = overUi ? null : bootstrap.Sim.World.Buildings.GetTopAt(cursor);
 
             HandleKeys(kb, cursor);
             if (Selected != null) HandlePlacing(mouse, cursor, overUi);
@@ -256,7 +256,7 @@ namespace Cogworks.View
             if (!mouse.rightButton.isPressed) _removing = false;
             if (!_removing || _lastRemoveTile == cursor) return;
 
-            if (bootstrap.Sim.World.Buildings.GetAt(cursor) != null)
+            if (bootstrap.Sim.World.Buildings.GetTopAt(cursor) != null)
                 bootstrap.Commands.Submit(new RemoveBuildingCommand(cursor));
             _lastRemoveTile = cursor;
         }

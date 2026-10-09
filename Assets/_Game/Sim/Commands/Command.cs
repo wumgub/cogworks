@@ -98,7 +98,7 @@ namespace Cogworks.Sim
             if (world.Sandbox) return world.Buildings.Remove(Tile);
 
             var player = Issuer(world);
-            var building = world.Buildings.GetAt(Tile);
+            var building = world.Buildings.GetTopAt(Tile);
             if (player == null || building == null) return false;
             var refund = new List<ItemStack> { new ItemStack(building.Spec.ItemId, 1) };
             building.Logic.CollectContents(refund);
@@ -190,6 +190,7 @@ namespace Cogworks.Sim
         public override bool Apply(World world)
         {
             var player = Issuer(world);
+            // Shafts hold nothing, so transfers always target the ground building.
             var building = world.Buildings.GetAt(Tile);
             if (player == null || building == null || Count <= 0) return false;
             if (IntoBuilding)

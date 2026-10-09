@@ -12,6 +12,8 @@ namespace Cogworks.View
     public sealed class BuildingsView : MonoBehaviour
     {
         public const int SortingOrder = 10;
+        // Above belt items (12) so shafts visibly pass over belts.
+        const int OverheadSortingOrder = 14;
         const int ArmSortingOrder = SortingOrder + 1;
         const int BadgeSortingOrder = SortingOrder + 3;
         const float BaseRpm = 32f;
@@ -80,7 +82,7 @@ namespace Cogworks.View
                 Fps = GameArt.BuildingFps(b.Spec),
             };
             view.Body.sprite = view.Frames[0];
-            view.Body.sortingOrder = SortingOrder;
+            view.Body.sortingOrder = b.Spec.Overhead ? OverheadSortingOrder : SortingOrder;
             Pose(go.transform, b.Spec, b.Origin, b.Direction);
 
             if (b.Spec.Kind == BuildingKind.Inserter && GameArt.InserterArm() is Sprite arm)

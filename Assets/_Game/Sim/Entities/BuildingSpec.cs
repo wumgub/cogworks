@@ -48,6 +48,11 @@ namespace Cogworks.Sim
         public readonly bool OrientOnDrag;
         /// <summary>Blocks player movement. Conveyors are walkable so players can step over them.</summary>
         public readonly bool Solid;
+        /// <summary>
+        /// Lives on the overhead layer (shafts): can share a tile with a belt underneath, but never with
+        /// a machine.
+        /// </summary>
+        public readonly bool Overhead;
 
         public KineticRole Kinetic { get; private set; }
         /// <summary>Generators: rotation speed supplied.</summary>
@@ -61,7 +66,7 @@ namespace Cogworks.Sim
 
         public BuildingSpec(ushort id, string key, string displayName, BuildingKind kind, int width, int height,
             bool rotatable = true, bool requiresOre = false, bool orientOnDrag = false, bool solid = true,
-            bool requiresAdjacentWater = false)
+            bool requiresAdjacentWater = false, bool overhead = false)
         {
             Id = id;
             Key = key;
@@ -74,7 +79,12 @@ namespace Cogworks.Sim
             OrientOnDrag = orientOnDrag;
             Solid = solid;
             RequiresAdjacentWater = requiresAdjacentWater;
+            Overhead = overhead;
         }
+
+        /// <summary>Belts, splitters and undergrounds: the only ground buildings allowed under an overhead shaft.</summary>
+        public bool IsBeltFamily => Kind == BuildingKind.Conveyor || Kind == BuildingKind.Splitter
+            || Kind == BuildingKind.UndergroundEntrance || Kind == BuildingKind.UndergroundExit;
 
         /// <summary>The item that places this building.</summary>
         public ushort ItemId => (ushort)(100 + Id);

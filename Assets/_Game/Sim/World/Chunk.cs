@@ -14,6 +14,8 @@ namespace Cogworks.Sim
         public readonly int[] OreAmount = new int[Area];
         /// <summary>Id of the building covering each tile, or 0.</summary>
         public readonly int[] Occupant = new int[Area];
+        /// <summary>Id of the overhead building (shaft) on each tile, or 0.</summary>
+        public readonly int[] Overhead = new int[Area];
 
         /// <summary>
         /// True once gameplay has changed this chunk (mining, building). Unmodified chunks are a pure
@@ -48,6 +50,7 @@ namespace Cogworks.Sim
             for (int i = 0; i < Area; i++) w.Write((byte)Ore[i]);
             for (int i = 0; i < Area; i++) w.Write(OreAmount[i]);
             for (int i = 0; i < Area; i++) w.Write(Occupant[i]);
+            for (int i = 0; i < Area; i++) w.Write(Overhead[i]);
         }
 
         internal static Chunk Read(BinaryReader r)
@@ -57,6 +60,7 @@ namespace Cogworks.Sim
             for (int i = 0; i < Area; i++) c.Ore[i] = (Ore)r.ReadByte();
             for (int i = 0; i < Area; i++) c.OreAmount[i] = r.ReadInt32();
             for (int i = 0; i < Area; i++) c.Occupant[i] = r.ReadInt32();
+            for (int i = 0; i < Area; i++) c.Overhead[i] = r.ReadInt32();
             c.MarkModified();
             return c;
         }
@@ -73,6 +77,7 @@ namespace Cogworks.Sim
                     c.Add((byte)Ore[i]);
                     c.Add(OreAmount[i]);
                     c.Add(Occupant[i]);
+                    c.Add(Overhead[i]);
                 }
                 _hash = c.Value;
                 _hashDirty = false;

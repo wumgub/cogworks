@@ -35,11 +35,22 @@ namespace Cogworks.Sim
 
         public Building Get(int id) => _byId.TryGetValue(id, out var b) ? b : null;
 
+        /// <summary>The ground-layer building on a tile (everything except overhead shafts).</summary>
         public Building GetAt(Int2 tile)
         {
             int id = _world.GetChunk(World.TileToChunk(tile)).Occupant[World.TileToIndex(tile)];
             return id == 0 ? null : _byId[id];
         }
+
+        /// <summary>The overhead building (shaft) on a tile, if any.</summary>
+        public Building GetOverheadAt(Int2 tile)
+        {
+            int id = _world.GetChunk(World.TileToChunk(tile)).Overhead[World.TileToIndex(tile)];
+            return id == 0 ? null : _byId[id];
+        }
+
+        /// <summary>What a player points at: the overhead building if there is one, else the ground one.</summary>
+        public Building GetTopAt(Int2 tile) => GetOverheadAt(tile) ?? GetAt(tile);
 
         public bool CanPlace(BuildingSpec spec, Int2 origin, Direction direction)
         {
@@ -55,7 +66,18 @@ namespace Cogworks.Sim
                 var chunk = _world.GetChunk(World.TileToChunk(tile));
                 int i = World.TileToIndex(tile);
                 if (!TerrainInfo.IsBuildable(chunk.Terrain[i])) return false;
-                if (chunk.Occupant[i] != 0) return false;
+                if (spec.Overhead)
+                {
+                    // Over empty ground or a belt, never through a machine.
+                    if (chunk.Overhead[i] != 0) return false;
+                    if (chunk.Occupant[i] != 0 && !_byId[chunk.Occupant[i]].Spec.IsBeltFamily) return false;
+                }
+                else
+                {
+                    if (chunk.Occupant[i] != 0) return false;
+                    // Only belts can go under a shaft.
+                    if (chunk.Overhead[i] != 0 && !spec.IsBeltFamily) return false;
+                }
                 if (chunk.Ore[i] != Ore.None) touchesOre = true;
             }
             if (spec.RequiresOre && !touchesOre) return false;
@@ -92,10 +114,13 @@ namespace Cogworks.Sim
 
         public bool Remove(Int2 tile) => Remove(tile, null);
 
-        /// <summary>Removes the building covering <paramref name="tile"/>, adding its contents to <paramref name="contents"/>.</summary>
+        /// <summary>
+        /// Removes the topmost building on <paramref name="tile"/> (an overhead shaft before the belt under it),
+        /// adding its contents to <paramref name="contents"/>.
+        /// </summary>
         internal bool Remove(Int2 tile, List<ItemStack> contents)
         {
-            var building = GetAt(tile);
+            var building = GetTopAt(tile);
             if (building == null) return false;
 
             building.Logic.CollectContents(contents ?? new List<ItemStack>());
@@ -127,7 +152,7 @@ namespace Cogworks.Sim
         /// </summary>
         public bool SetDirection(Int2 tile, Direction direction)
         {
-            var building = GetAt(tile);
+            var building = GetTopAt(tile);
             if (building == null || !building.Spec.Rotatable) return false;
             if (building.Spec.Width != building.Spec.Height) return false;
             if (building.Direction == direction) return false;
@@ -144,7 +169,7 @@ namespace Cogworks.Sim
             foreach (var tile in building.Footprint())
             {
                 var chunk = _world.GetChunk(World.TileToChunk(tile));
-                chunk.Occupant[World.TileToIndex(tile)] = id;
+                (building.Spec.Overhead ? chunk.Overhead : chunk.Occupant)[World.TileToIndex(tile)] = id;
                 chunk.MarkModified();
             }
         }

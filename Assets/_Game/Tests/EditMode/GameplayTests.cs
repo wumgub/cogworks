@@ -185,6 +185,88 @@ namespace Cogworks.Sim.Tests
             Assert.AreEqual(1, feed.Items.Count);
         }
 
+        // ------------------------------------------------------------------ overhead shafts
+
+        [Test]
+        public void Shaft_CanRunOverBelt_AndBeltUnderShaft()
+        {
+            var w = Sandbox().World;
+            var o = ClearArea(w, 2, 1);
+            var belt = Place(w, BuildingCatalog.Conveyor, o, Direction.East);
+            var shaft = Place(w, BuildingCatalog.Shaft, o, Direction.North);
+            Assert.AreSame(belt, w.Buildings.GetAt(o));
+            Assert.AreSame(shaft, w.Buildings.GetOverheadAt(o));
+            Assert.AreSame(shaft, w.Buildings.GetTopAt(o));
+
+            var next = new Int2(o.X + 1, o.Y);
+            Place(w, BuildingCatalog.Shaft, next, Direction.North);
+            Assert.IsNotNull(w.Buildings.Place(BuildingCatalog.Conveyor, next, Direction.East), "belt goes under an existing shaft");
+        }
+
+        [Test]
+        public void Shaft_CannotPassThroughMachines_NorMachinesUnderShafts()
+        {
+            var w = Sandbox().World;
+            var o = ClearArea(w, 3, 1);
+            Place(w, BuildingCatalog.Chest, o);
+            Assert.IsNull(w.Buildings.Place(BuildingCatalog.Shaft, o, Direction.North));
+
+            var t = new Int2(o.X + 2, o.Y);
+            Place(w, BuildingCatalog.Shaft, t, Direction.North);
+            Assert.IsNull(w.Buildings.Place(BuildingCatalog.Chest, t, Direction.North));
+            Assert.IsNull(w.Buildings.Place(BuildingCatalog.Shaft, t, Direction.East), "one shaft per tile");
+        }
+
+        [Test]
+        public void Removing_TakesTheShaftFirst_ThenTheBelt()
+        {
+            var w = Sandbox().World;
+            var o = ClearArea(w, 1, 1);
+            Place(w, BuildingCatalog.Conveyor, o, Direction.East);
+            Place(w, BuildingCatalog.Shaft, o, Direction.North);
+
+            Assert.IsTrue(w.Buildings.Remove(o));
+            Assert.IsNull(w.Buildings.GetOverheadAt(o));
+            Assert.IsNotNull(w.Buildings.GetAt(o), "belt stays after the shaft is removed");
+            Assert.IsTrue(w.Buildings.Remove(o));
+            Assert.IsNull(w.Buildings.GetAt(o));
+        }
+
+        [Test]
+        public void ShaftOverBelts_StillPowersDrill_AndBeltsStillMoveItems()
+        {
+            var sim = Sandbox();
+            var w = sim.World;
+            var (drill, _, o) = DrillSetup(w);
+            var crankAt = new Int2(o.X - 3, o.Y);
+            Place(w, BuildingCatalog.HandCrank, crankAt);
+            // A belt line crossing under both shaft tiles, running north.
+            var under = new Int2(o.X - 1, o.Y);
+            var belt = (ConveyorLogic)Place(w, BuildingCatalog.Conveyor, under, Direction.North).Logic;
+            Place(w, BuildingCatalog.Conveyor, new Int2(o.X - 2, o.Y), Direction.North);
+            Place(w, BuildingCatalog.Shaft, new Int2(o.X - 2, o.Y), Direction.East);
+            Place(w, BuildingCatalog.Shaft, under, Direction.East);
+
+            belt.TryInsertAtEntry(IronOre);
+            sim.Schedule(sim.Tick, new CrankCommand(crankAt));
+            Run(sim, 20);
+            Assert.AreEqual(32, drill.LastRpm, "rotation passes through shafts sitting over belts");
+            Assert.Greater(belt.Items[0].Pos, 0, "belt under the shaft keeps moving");
+        }
+
+        [Test]
+        public void Snapshot_PreservesOverheadLayer()
+        {
+            var a = Sandbox();
+            var o = ClearArea(a.World, 1, 1);
+            Place(a.World, BuildingCatalog.Conveyor, o, Direction.East);
+            Place(a.World, BuildingCatalog.Shaft, o, Direction.North);
+            var b = Snapshot.Load(Snapshot.Save(a));
+            Assert.AreEqual(a.ComputeHash(), b.ComputeHash());
+            Assert.AreEqual(BuildingCatalog.Shaft, b.World.Buildings.GetOverheadAt(o).Spec);
+            Assert.AreEqual(BuildingCatalog.Conveyor, b.World.Buildings.GetAt(o).Spec);
+        }
+
         // ------------------------------------------------------------------ inserters and chests
 
         [Test]

@@ -102,13 +102,16 @@ namespace Cogworks.Sim
                 var b = kinetic[i];
                 foreach (var (tile, side) in b.Neighbours())
                 {
-                    var other = world.Buildings.GetAt(tile);
-                    if (other == null || other == b || !index.TryGetValue(other.Id, out int j)) continue;
-                    if (!ConnectsThrough(b, side) || !ConnectsThrough(other, side.Opposite())) continue;
-                    int a = Find(i), c = Find(j);
-                    // Union toward the lower index so roots (and network order) are deterministic.
-                    if (a < c) parent[c] = a;
-                    else if (c < a) parent[a] = c;
+                    // Shafts sit on the overhead layer, machines on the ground; either can connect.
+                    foreach (var other in new[] { world.Buildings.GetAt(tile), world.Buildings.GetOverheadAt(tile) })
+                    {
+                        if (other == null || other == b || !index.TryGetValue(other.Id, out int j)) continue;
+                        if (!ConnectsThrough(b, side) || !ConnectsThrough(other, side.Opposite())) continue;
+                        int a = Find(i), c = Find(j);
+                        // Union toward the lower index so roots (and network order) are deterministic.
+                        if (a < c) parent[c] = a;
+                        else if (c < a) parent[a] = c;
+                    }
                 }
             }
 

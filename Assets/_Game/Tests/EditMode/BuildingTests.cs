@@ -156,13 +156,12 @@ namespace Cogworks.Sim.Tests
         }
 
         [Test]
-        public void BeltFamily_IsWalkable_OtherBuildingsAreSolid()
+        public void BeltsAndShafts_AreWalkable_OtherBuildingsAreSolid()
         {
             foreach (var spec in BuildingCatalog.All)
             {
-                bool belt = spec.Kind == BuildingKind.Conveyor || spec.Kind == BuildingKind.Splitter
-                    || spec.Kind == BuildingKind.UndergroundEntrance || spec.Kind == BuildingKind.UndergroundExit;
-                Assert.AreEqual(!belt, spec.Solid, spec.Key);
+                // Belts are walked over and overhead shafts are walked under.
+                Assert.AreEqual(!spec.IsBeltFamily && !spec.Overhead, spec.Solid, spec.Key);
             }
         }
     }

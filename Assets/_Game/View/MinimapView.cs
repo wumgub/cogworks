@@ -125,7 +125,7 @@ namespace Cogworks.View
 
         static Color32 TileColor(World world, Int2 tile)
         {
-            var building = world.Buildings.GetAt(tile);
+            var building = world.Buildings.GetTopAt(tile);
             if (building != null) return BuildingColor(building.Spec);
             var ore = world.GetOre(tile, out _);
             switch (ore)
