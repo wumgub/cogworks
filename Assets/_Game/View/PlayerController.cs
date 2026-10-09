@@ -5,8 +5,8 @@ using UnityEngine.InputSystem;
 namespace Cogworks.View
 {
     /// <summary>
-    /// WASD movement against sim terrain and solid buildings. Avatars live outside the deterministic sim and will be synced
-    /// as plain networked transforms in milestone 3.
+    /// WASD movement against sim terrain and solid buildings, plus riding conveyor belts. Avatars live
+    /// outside the deterministic sim and are synced as plain networked transforms.
     /// </summary>
     [RequireComponent(typeof(SpriteRenderer))]
     public sealed class PlayerController : MonoBehaviour
@@ -16,6 +16,8 @@ namespace Cogworks.View
         [SerializeField] float speed = 6f;
         [Tooltip("Half-size of the collision box, in tiles.")]
         [SerializeField] float radius = 0.3f;
+        [Tooltip("How strongly a belt pulls its rider toward its centre line (per second).")]
+        [SerializeField] float beltCentering = 4f;
 
         /// <summary>Only the local player's avatar reads input; remote avatars are moved by the network.</summary>
         public bool IsLocal { get; set; } = true;
@@ -31,20 +33,47 @@ namespace Cogworks.View
 
         void Update()
         {
-            var kb = Keyboard.current;
-            if (kb == null || !IsLocal || !InputEnabled || bootstrap.Sim == null) return;
+            if (!IsLocal || bootstrap.Sim == null) return;
 
+            Vector2 walk = InputEnabled ? ReadInput() * speed : Vector2.zero;
+            // Belts keep carrying you while a menu is open (multiplayer doesn't pause), but not when paused.
+            Vector2 belt = bootstrap.Paused ? Vector2.zero : BeltVelocity();
+            Vector2 delta = (walk + belt) * Time.deltaTime;
+            if (delta == Vector2.zero) return;
+
+            // Move each axis separately so the player slides along shorelines instead of sticking.
+            TryMove(new Vector2(delta.x, 0f));
+            TryMove(new Vector2(0f, delta.y));
+        }
+
+        static Vector2 ReadInput()
+        {
+            var kb = Keyboard.current;
+            if (kb == null) return Vector2.zero;
             var input = Vector2.zero;
             if (kb.wKey.isPressed || kb.upArrowKey.isPressed) input.y += 1f;
             if (kb.sKey.isPressed || kb.downArrowKey.isPressed) input.y -= 1f;
             if (kb.dKey.isPressed || kb.rightArrowKey.isPressed) input.x += 1f;
             if (kb.aKey.isPressed || kb.leftArrowKey.isPressed) input.x -= 1f;
-            if (input == Vector2.zero) return;
+            return input.normalized;
+        }
 
-            Vector2 delta = input.normalized * (speed * Time.deltaTime);
-            // Move each axis separately so the player slides along shorelines instead of sticking.
-            TryMove(new Vector2(delta.x, 0f));
-            TryMove(new Vector2(0f, delta.y));
+        /// <summary>
+        /// Velocity from the belt under the player's centre: its item speed along its direction, plus a pull
+        /// toward the belt's centre line so riders stay on track and follow corners.
+        /// </summary>
+        Vector2 BeltVelocity()
+        {
+            Vector2 p = transform.position;
+            var tile = new Int2(Mathf.FloorToInt(p.x), Mathf.FloorToInt(p.y));
+            if (!(bootstrap.Sim.World.Buildings.GetAt(tile)?.Logic is ConveyorLogic belt)) return Vector2.zero;
+
+            Int2 o = belt.Building.Direction.ToOffset();
+            var dir = new Vector2(o.X, o.Y);
+            float tilesPerSecond = belt.Speed * Simulation.TicksPerSecond / (float)ConveyorLogic.Length;
+            Vector2 toCentre = new Vector2(tile.X + 0.5f, tile.Y + 0.5f) - p;
+            Vector2 sideways = toCentre - dir * Vector2.Dot(toCentre, dir);
+            return dir * tilesPerSecond + sideways * beltCentering;
         }
 
         void TryMove(Vector2 delta)

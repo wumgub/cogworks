@@ -72,6 +72,7 @@ namespace Cogworks.Editor
             hudDoc.panelSettings = panelSettings;
             hudDoc.visualTreeAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(UiDir + "/Hud.uxml");
             var hotbar = hudGo.AddComponent<HotbarView>();
+            var minimap = hudGo.AddComponent<MinimapView>();
 
             var panelsGo = new GameObject("Panels");
             var panelsDoc = panelsGo.AddComponent<UIDocument>();
@@ -112,6 +113,7 @@ namespace Cogworks.Editor
             Wire(buildingsView, ("bootstrap", bootstrap), ("worldCamera", camera));
             Wire(build, ("bootstrap", bootstrap), ("worldCamera", camera), ("hotbar", hotbar));
             Wire(hotbar, ("build", build));
+            Wire(minimap, ("bootstrap", bootstrap), ("worldCamera", camera));
             Wire(beltItems, ("bootstrap", bootstrap), ("worldCamera", camera));
             Wire(sound, ("bootstrap", bootstrap), ("build", build));
             Wire(panels, ("bootstrap", bootstrap), ("build", build));

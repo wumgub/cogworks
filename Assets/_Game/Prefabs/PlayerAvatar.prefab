@@ -112,6 +112,7 @@ MonoBehaviour:
   bootstrap: {fileID: 0}
   speed: 6
   radius: 0.3
+  beltCentering: 4
 --- !u!114 &2723170899611565690
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -136,7 +137,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 1689951942
+  GlobalObjectIdHash: 547658025
   InScenePlacedSourceGlobalObjectIdHash: 0
   m_InScenePlacedDisabledByDefault: 0
   DeferredDespawnTick: 0

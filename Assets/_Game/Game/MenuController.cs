@@ -263,7 +263,7 @@ WASD moves. Scroll zooms. Number keys 1-9 and 0 pick a building; R rotates it (S
 
 <b>Getting started</b>
 1. With no tool selected, hold left-click on an ore patch to mine it by hand.
-2. Press Tab for your inventory and hand crafting. Stone makes furnaces; furnaces smelt ore into plates when given coal.
+2. Press Tab for your inventory and hand crafting. The minimap (top right) shows ore patches nearby; M zooms it out. Stone makes furnaces; furnaces smelt ore into plates when given coal.
 3. Click any building to open it, and click items to move them in or out.
 
 <b>Rotational power</b>
@@ -271,7 +271,7 @@ Drills and assemblers need rotation, like in Create. Generators make it: a Hand 
 Every machine adds stress. If a network needs more stress (SU) than its generators supply, the whole network stops and its cogs turn red. Add generators or split the network.
 
 <b>Logistics</b>
-Conveyor belts carry up to 4 items per tile and feed into belts ahead of them, including from the side. Inserters move items from the tile behind them to the tile in front (follow the arrow). Drills push ore into whatever is in front of them. Splitters deal a belt's items out to the front, left and right. An underground belt entrance tunnels to the first exit facing the same way up to 5 tiles ahead.
+Conveyor belts carry up to 4 items per tile (and you, if you stand on one) and feed into belts ahead of them, including from the side. Inserters move items from the tile behind them to the tile in front (follow the arrow). Drills push ore into whatever is in front of them. Splitters deal a belt's items out to the front, left and right. An underground belt entrance tunnels to the first exit facing the same way up to 5 tiles ahead.
 
 <b>Research</b>
 Craft Automation Science packs, build a Research Lab, put packs in it, and press T to choose a project. Research unlocks assemblers, splitters, underground belts, steam engines, green science and fast belts.
