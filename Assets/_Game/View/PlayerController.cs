@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 namespace Cogworks.View
 {
     /// <summary>
-    /// WASD movement against sim terrain. Avatars live outside the deterministic sim and will be synced
+    /// WASD movement against sim terrain and solid buildings. Avatars live outside the deterministic sim and will be synced
     /// as plain networked transforms in milestone 3.
     /// </summary>
     [RequireComponent(typeof(SpriteRenderer))]
@@ -42,20 +42,49 @@ namespace Cogworks.View
 
         void TryMove(Vector2 delta)
         {
-            Vector2 next = (Vector2)transform.position + delta;
-            if (IsWalkable(next)) transform.position = new Vector3(next.x, next.y, transform.position.z);
+            Vector2 current = transform.position;
+            Vector2 next = current + delta;
+            if (CanOccupy(current, next)) transform.position = new Vector3(next.x, next.y, transform.position.z);
         }
 
-        bool IsWalkable(Vector2 p)
+        /// <summary>True if the player's tile bounds overlap the given footprint (used to block placement on yourself).</summary>
+        public bool Overlaps(Int2 origin, Int2 size)
+        {
+            RectInt r = TileBounds(transform.position);
+            return r.xMin < origin.X + size.X && origin.X < r.xMax
+                && r.yMin < origin.Y + size.Y && origin.Y < r.yMax;
+        }
+
+        // Blocks entering water or solid buildings. Tiles the player already overlaps are exempt, so someone
+        // who gets built over (e.g. by another player) can still walk out.
+        bool CanOccupy(Vector2 from, Vector2 to)
+        {
+            RectInt current = TileBounds(from);
+            RectInt next = TileBounds(to);
+            for (int y = next.yMin; y < next.yMax; y++)
+            for (int x = next.xMin; x < next.xMax; x++)
+            {
+                if (current.Contains(new Vector2Int(x, y))) continue;
+                if (IsBlocked(new Int2(x, y))) return false;
+            }
+            return true;
+        }
+
+        RectInt TileBounds(Vector2 p)
+        {
+            int x0 = Mathf.FloorToInt(p.x - radius);
+            int x1 = Mathf.FloorToInt(p.x + radius);
+            int y0 = Mathf.FloorToInt(p.y - radius);
+            int y1 = Mathf.FloorToInt(p.y + radius);
+            return new RectInt(x0, y0, x1 - x0 + 1, y1 - y0 + 1);
+        }
+
+        bool IsBlocked(Int2 tile)
         {
             var world = bootstrap.Sim.World;
-            return Walkable(world, p.x - radius, p.y - radius)
-                && Walkable(world, p.x + radius, p.y - radius)
-                && Walkable(world, p.x - radius, p.y + radius)
-                && Walkable(world, p.x + radius, p.y + radius);
+            if (!TerrainInfo.IsWalkable(world.GetTerrain(tile))) return true;
+            var building = world.Buildings.GetAt(tile);
+            return building != null && building.Spec.Solid;
         }
-
-        static bool Walkable(World world, float x, float y) =>
-            TerrainInfo.IsWalkable(world.GetTerrain(new Int2(Mathf.FloorToInt(x), Mathf.FloorToInt(y))));
     }
 }

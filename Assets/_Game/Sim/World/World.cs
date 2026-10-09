@@ -12,7 +12,10 @@ namespace Cogworks.Sim
         public World(uint seed)
         {
             Seed = seed;
+            Buildings = new BuildingManager(this);
         }
+
+        public BuildingManager Buildings { get; }
 
         public int LoadedChunkCount => _chunks.Count;
 
@@ -57,6 +60,7 @@ namespace Cogworks.Sim
             keys.Sort();
             foreach (long key in keys)
                 _chunks[key].AddToHash(ref h);
+            Buildings.AddToHash(ref h);
         }
     }
 }

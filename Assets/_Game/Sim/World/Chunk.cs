@@ -10,6 +10,8 @@ namespace Cogworks.Sim
         public readonly TerrainType[] Terrain = new TerrainType[Area];
         public readonly Ore[] Ore = new Ore[Area];
         public readonly int[] OreAmount = new int[Area];
+        /// <summary>Id of the building covering each tile, or 0.</summary>
+        public readonly int[] Occupant = new int[Area];
 
         /// <summary>
         /// True once gameplay has changed this chunk (mining, building). Unmodified chunks are a pure
@@ -36,6 +38,7 @@ namespace Cogworks.Sim
                 h.Add((byte)Terrain[i]);
                 h.Add((byte)Ore[i]);
                 h.Add(OreAmount[i]);
+                h.Add(Occupant[i]);
             }
         }
     }

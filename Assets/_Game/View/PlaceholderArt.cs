@@ -15,6 +15,7 @@ namespace Cogworks.View
 
         static readonly Dictionary<TerrainType, Tile> TerrainTiles = new Dictionary<TerrainType, Tile>();
         static readonly Dictionary<Ore, Tile> OreTiles = new Dictionary<Ore, Tile>();
+        static readonly Dictionary<ushort, Sprite> BuildingSprites = new Dictionary<ushort, Sprite>();
         static Sprite _player;
 
         public static Tile TerrainTile(TerrainType terrain)
@@ -56,6 +57,62 @@ namespace Cogworks.View
             _player = MakeSprite(px, "Player");
             return _player;
         }
+
+        /// <summary>
+        /// Sprite covering the building's unrotated (North-facing) footprint. Rotatable buildings get an
+        /// arrow pointing up, so rotating the transform shows their facing.
+        /// </summary>
+        public static Sprite BuildingSprite(BuildingSpec spec)
+        {
+            if (BuildingSprites.TryGetValue(spec.Id, out var cached)) return cached;
+
+            int w = spec.Width * PixelsPerUnit;
+            int h = spec.Height * PixelsPerUnit;
+            Color32 body = BuildingColor(spec);
+            Color32 border = Shade(body, -60);
+            Color32 inner = Shade(body, 18);
+            Color32 arrow = new Color32(250, 240, 210, 255);
+
+            var px = new Color32[w * h];
+            for (int y = 0; y < h; y++)
+            for (int x = 0; x < w; x++)
+            {
+                bool edge = x == 0 || y == 0 || x == w - 1 || y == h - 1;
+                bool bevel = x == 1 || y == h - 2;
+                px[y * w + x] = edge ? border : bevel ? inner : body;
+            }
+
+            if (spec.Rotatable)
+            {
+                // Chevron centered in the footprint, pointing North.
+                int cx = w / 2;
+                int top = h / 2 + 3;
+                for (int row = 0; row < 4; row++)
+                for (int t = 0; t < 2; t++)
+                {
+                    int y = top - row - t;
+                    px[y * w + cx - 1 - row] = arrow;
+                    px[y * w + cx + row] = arrow;
+                }
+            }
+
+            var sprite = MakeSprite(px, w, h, spec.Key);
+            BuildingSprites[spec.Id] = sprite;
+            return sprite;
+        }
+
+        static Color32 BuildingColor(BuildingSpec spec) => spec.Key switch
+        {
+            "conveyor" => new Color32(70, 70, 78, 255),
+            "inserter" => new Color32(200, 170, 50, 255),
+            "chest" => new Color32(150, 100, 55, 255),
+            "drill" => new Color32(95, 110, 130, 255),
+            "furnace" => new Color32(140, 125, 110, 255),
+            "assembler" => new Color32(80, 115, 150, 255),
+            "shaft" => new Color32(165, 135, 90, 255),
+            "hand_crank" => new Color32(120, 85, 60, 255),
+            _ => new Color32(200, 0, 200, 255),
+        };
 
         static Sprite MakeTerrainSprite(TerrainType terrain)
         {
@@ -110,9 +167,11 @@ namespace Cogworks.View
             (byte)Mathf.Clamp(c.b + delta, 0, 255),
             c.a);
 
-        static Sprite MakeSprite(Color32[] pixels, string name)
+        static Sprite MakeSprite(Color32[] pixels, string name) => MakeSprite(pixels, PixelsPerUnit, PixelsPerUnit, name);
+
+        static Sprite MakeSprite(Color32[] pixels, int width, int height, string name)
         {
-            var tex = new Texture2D(PixelsPerUnit, PixelsPerUnit, TextureFormat.RGBA32, false)
+            var tex = new Texture2D(width, height, TextureFormat.RGBA32, false)
             {
                 filterMode = FilterMode.Point,
                 wrapMode = TextureWrapMode.Clamp,
@@ -120,7 +179,7 @@ namespace Cogworks.View
             };
             tex.SetPixels32(pixels);
             tex.Apply();
-            var sprite = Sprite.Create(tex, new Rect(0, 0, PixelsPerUnit, PixelsPerUnit), new Vector2(0.5f, 0.5f), PixelsPerUnit);
+            var sprite = Sprite.Create(tex, new Rect(0, 0, width, height), new Vector2(0.5f, 0.5f), PixelsPerUnit);
             sprite.name = name;
             return sprite;
         }

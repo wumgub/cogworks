@@ -1,0 +1,73 @@
+.hud-root {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    align-items: center;
+    padding-bottom: 12px;
+}
+
+.selected-name {
+    font-size: 15px;
+    -unity-font-style: bold;
+    color: rgb(245, 240, 225);
+    margin-bottom: 4px;
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgb(20, 22, 28);
+}
+
+.hotbar {
+    flex-direction: row;
+    padding: 4px;
+    background-color: rgba(20, 22, 28, 0.88);
+    border-width: 2px;
+    border-color: rgb(58, 62, 72);
+    border-radius: 4px;
+}
+
+.slot {
+    width: 52px;
+    height: 52px;
+    margin: 2px;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(38, 42, 50);
+    border-width: 2px;
+    border-color: rgb(66, 70, 80);
+    border-radius: 2px;
+}
+
+.slot:hover {
+    border-color: rgb(140, 144, 154);
+}
+
+.slot--selected {
+    background-color: rgb(72, 60, 36);
+    border-color: rgb(240, 180, 60);
+}
+
+.slot--selected:hover {
+    border-color: rgb(255, 205, 100);
+}
+
+.slot-icon {
+    width: 32px;
+    height: 32px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.slot-key {
+    position: absolute;
+    left: 3px;
+    top: 0;
+    font-size: 11px;
+    color: rgb(190, 190, 196);
+}
+
+.hint {
+    margin-top: 5px;
+    font-size: 11px;
+    color: rgba(235, 235, 240, 0.65);
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgba(20, 22, 28, 0.8);
+}

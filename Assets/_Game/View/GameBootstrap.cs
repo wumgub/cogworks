@@ -15,12 +15,16 @@ namespace Cogworks.View
 
         public Simulation Sim { get; private set; }
 
+        /// <summary>Where input sends commands. Swapped for a network sink in multiplayer.</summary>
+        public ICommandSink Commands { get; private set; }
+
         /// <summary>Fraction of the way to the next tick, for interpolating visuals.</summary>
         public float TickAlpha => _accumulator * Simulation.TicksPerSecond;
 
         void Awake()
         {
             Sim = new Simulation(seed);
+            Commands = new LocalCommandSink(Sim);
         }
 
         void Update()
