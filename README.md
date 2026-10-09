@@ -95,8 +95,8 @@ Grab the archive for your system from the [latest release](https://github.com/wu
 
 ## Multiplayer
 
-Up to **4 players** build in the same world, in real time. Each player gets their own engineer color, and
-anyone can drop in while the game is running.
+Up to **4 players** build in the same world, in real time: online with a join code, or over LAN. Each player
+gets their own engineer color, and anyone can drop in while the game is running.
 
 <p align="center">
   <img src="Docs/Screenshots/multiplayer-host-wide.png" alt="Four players around a factory, seen by the host" width="760"><br>
@@ -108,10 +108,20 @@ anyone can drop in while the game is running.
   <sub>The same moment from player 3's machine: "Connected · player 3". Every player's world stays identical.</sub>
 </p>
 
+### Playing online with a join code (easiest)
+
+1. **Host:** on the main menu, click **Host Online Game**. To continue an existing world, tick
+   *Host my saved world* first.
+2. A short **join code** appears in the top-left corner (for example `KGPR7M`). It's also in the pause menu
+   (**Esc**), with a **Copy** button.
+3. **Friends:** type the code into the box next to **Join by Code** and click it.
+
+That's it: no IP addresses, no router setup and no VPN. Connections go through Unity Relay, so it works across
+different networks and countries.
+
 ### Playing on the same network (LAN)
 
-1. **Host:** on the main menu, click **Host LAN Game**. To continue an existing world, tick
-   *Host my saved world* first.
+1. **Host:** click **Host LAN Game**.
 2. **Find the host's IP:** on the host's computer,
    - **macOS:** System Settings → Wi-Fi → Details → IP address
    - **Windows:** run `ipconfig` and look for *IPv4 Address*
@@ -120,18 +130,8 @@ anyone can drop in while the game is running.
    Add `:port` if the host changed it from 7777.
 4. On Windows, allow Cogworks through the firewall the first time it asks.
 
-### Playing over the internet
-
-Cogworks connects directly to the host, so friends outside your home network need one of these:
-
-- **Easiest: a free virtual LAN.** Everyone installs [Tailscale](https://tailscale.com/) (or ZeroTier, or
-  Radmin VPN) and joins the same network. The host shares their Tailscale IP (`100.x.y.z`) and friends use
-  **Join LAN** with it. No router setup needed.
-- **Port forwarding:** the host forwards **UDP port 7777** on their router to their computer. Friends then
-  join with the host's public IP (search "what is my IP").
-
-> **Join codes** (Host Online / Join by Code) use Unity Relay and are coming in a future release. For now, use
-> LAN, a virtual LAN, or port forwarding.
+LAN mode also works over the internet with a virtual LAN like [Tailscale](https://tailscale.com/) (join with
+the host's `100.x.y.z` address), or if the host forwards **UDP port 7777** on their router.
 
 ### How it stays in sync
 
@@ -199,7 +199,6 @@ Cogworks -batchmode -nographics -cw-mode client -cw-ip 127.0.0.1 -cw-port 7777 -
 
 ## Roadmap
 
-- Online join codes through Unity Relay
 - Fluids and pipes, trains, more machine tiers
 - Music, and more sound
 - Dedicated server mode

@@ -10,7 +10,8 @@ namespace Cogworks.Game
     /// <summary>
     /// Starts a game straight from command-line flags, skipping the menu. Used for dedicated testing:
     /// <code>
-    ///   -cw-mode single|host|client   -cw-ip 127.0.0.1   -cw-port 7777   -cw-seed 123
+    ///   -cw-mode single|host|client|online-host|online-client   -cw-ip 127.0.0.1   -cw-port 7777   -cw-seed 123
+    ///   -cw-code ABC123               # join code for online-client (Unity Relay)
     ///   -cw-autotest 60               # issue random commands of every kind for N seconds, then quit
     ///   -cw-sandbox                   # host a sandbox world (free building) so random builds succeed
     ///   -cw-log path.txt              # write "tick hash" lines every hash interval
@@ -75,6 +76,13 @@ namespace Cogworks.Game
                     if (shotDir != null) StartCoroutine(DemoScenario.CaptureMultiplayerShots(shotDir, "host", cameraRig, 16f));
                     break;
                 }
+                case "online-host":
+                    _ = game.HostOnline(new Simulation(seed, sandbox: args.ContainsKey("-cw-sandbox")));
+                    StartCoroutine(LogJoinCode());
+                    break;
+                case "online-client":
+                    _ = game.JoinOnline(args.TryGetValue("-cw-code", out string code) ? code : "");
+                    break;
                 case "client":
                     game.JoinLan(ip, port);
                     if (shotDir != null) StartCoroutine(DemoScenario.CaptureMultiplayerShots(shotDir, "client", cameraRig, 13f));
@@ -159,6 +167,20 @@ namespace Cogworks.Game
             float r = 2.5f + id * 0.9f;
             var target = _wanderCentre + new Vector2(Mathf.Cos(t) * r * 1.4f, Mathf.Sin(t) * r * 0.8f);
             local.transform.position = Vector3.MoveTowards(local.transform.position, target, 6f * Time.deltaTime);
+        }
+
+        System.Collections.IEnumerator LogJoinCode()
+        {
+            while (game.Busy || game.JoinCode == null)
+            {
+                if (!game.Busy && game.Mode == GameMode.None)
+                {
+                    Log("# online host failed: " + game.Status);
+                    yield break;
+                }
+                yield return null;
+            }
+            Log("# join code " + game.JoinCode);
         }
 
         void OnStepped(long tick)

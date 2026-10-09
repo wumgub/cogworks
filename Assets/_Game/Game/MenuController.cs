@@ -280,6 +280,6 @@ Craft Automation Science packs, build a Research Lab, put packs in it, and press
 F5 saves, and the game autosaves every 5 minutes. The host's save holds the whole multiplayer world; tick 'Host my saved world' to continue it with friends.
 
 <b>Multiplayer</b>
-Host Online gives a join code for friends (needs the project linked to Unity Cloud). Host LAN plus Join LAN works on a local network, or over the internet with port 7777 forwarded.";
+Host Online Game gives you a short join code: friends type it into Join by Code and connect from anywhere, with no router setup. Host LAN plus Join LAN works on a local network, over a virtual LAN like Tailscale, or over the internet with UDP port 7777 forwarded.";
     }
 }
