@@ -31,6 +31,10 @@
                 </ui:VisualElement>
 
                 <ui:Label name="status" class="status" />
+                <ui:VisualElement class="row">
+                    <ui:Button name="open-help" text="How to Play" class="btn grow" />
+                    <ui:Button name="open-settings" text="Settings" class="btn grow gap-left" />
+                </ui:VisualElement>
                 <ui:Button name="quit" text="Quit" class="btn btn--quiet" />
             </ui:VisualElement>
         </ui:VisualElement>
@@ -39,10 +43,38 @@
             <ui:VisualElement class="panel panel--small">
                 <ui:Label text="Paused" class="title title--small" />
                 <ui:Label name="pause-note" class="subtitle" />
+                <ui:VisualElement name="join-code-box" class="row">
+                    <ui:Label name="pause-join-code" class="code grow" />
+                    <ui:Button name="copy-code" text="Copy" class="btn gap-left" />
+                </ui:VisualElement>
                 <ui:Button name="resume" text="Resume" class="btn btn--primary" />
-                <ui:Button name="save" text="Save Game" class="btn" />
+                <ui:Button name="save" text="Save Game (F5)" class="btn" />
+                <ui:VisualElement class="row">
+                    <ui:Button name="pause-help" text="How to Play" class="btn grow" />
+                    <ui:Button name="pause-settings" text="Settings" class="btn grow gap-left" />
+                </ui:VisualElement>
                 <ui:Button name="leave" text="Leave to Menu" class="btn" />
                 <ui:Label name="pause-status" class="status" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="settings-menu" class="overlay">
+            <ui:VisualElement class="panel panel--small">
+                <ui:Label text="Settings" class="title title--small" />
+                <ui:Slider name="master-volume" label="Master volume" low-value="0" high-value="1" class="setting" />
+                <ui:Slider name="sfx-volume" label="Effects volume" low-value="0" high-value="1" class="setting" />
+                <ui:Toggle name="fullscreen" label="Fullscreen" class="toggle setting" />
+                <ui:Button name="settings-back" text="Back" class="btn btn--primary" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="help-menu" class="overlay">
+            <ui:VisualElement class="panel panel--help">
+                <ui:Label text="How to Play" class="title title--small" />
+                <ui:ScrollView class="help-scroll">
+                    <ui:Label name="help-text" class="help-text" />
+                </ui:ScrollView>
+                <ui:Button name="help-back" text="Back" class="btn btn--primary" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

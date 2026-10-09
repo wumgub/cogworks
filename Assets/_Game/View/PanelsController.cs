@@ -130,7 +130,11 @@ namespace Cogworks.View
             _nextRefresh = 0f;
         }
 
-        void Submit(Command c) => bootstrap.Commands?.Submit(c);
+        void Submit(Command c)
+        {
+            bootstrap.Commands?.Submit(c);
+            SoundFx.Instance?.Play(Sfx.Click, 0.7f);
+        }
 
         void Refresh(Simulation sim)
         {

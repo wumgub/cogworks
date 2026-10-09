@@ -16,6 +16,7 @@ namespace Cogworks.Game
     ///   -cw-log path.txt              # write "tick hash" lines every hash interval
     ///   -cw-demo                      # single-player sandbox with a small working factory
     ///   -cw-shots dir                 # with -cw-demo: screenshot the world and each panel, then quit
+    ///   -cw-menushots dir             # screenshot the main menu, help and settings, then quit
     /// </code>
     /// Comparing the logs from a host and its clients proves they ran identical simulations.
     /// </summary>
@@ -25,6 +26,7 @@ namespace Cogworks.Game
         [SerializeField] GameBootstrap bootstrap;
         [SerializeField] PanelsController panels;
         [SerializeField] CameraRig cameraRig;
+        [SerializeField] MenuController menu;
 
         float _autotestSeconds;
         float _startTime;
@@ -36,6 +38,11 @@ namespace Cogworks.Game
         void Start()
         {
             var args = ParseArgs(Environment.GetCommandLineArgs());
+            if (args.TryGetValue("-cw-menushots", out string menuShots))
+            {
+                StartCoroutine(DemoScenario.CaptureMenuShots(menuShots, menu, cameraRig));
+                return;
+            }
             if (!args.TryGetValue("-cw-mode", out string mode)) return;
             _active = true;
 

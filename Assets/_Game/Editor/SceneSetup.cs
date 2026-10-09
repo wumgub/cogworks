@@ -60,6 +60,7 @@ namespace Cogworks.Editor
             var buildingsView = gameGo.AddComponent<BuildingsView>();
             var build = gameGo.AddComponent<BuildController>();
             var beltItems = gameGo.AddComponent<BeltItemsView>();
+            var sound = gameGo.AddComponent<SoundFx>();
 
             var panelSettings = GetOrCreatePanelSettings();
             var hudGo = new GameObject("HUD");
@@ -107,11 +108,12 @@ namespace Cogworks.Editor
             Wire(build, ("bootstrap", bootstrap), ("worldCamera", camera), ("hotbar", hotbar));
             Wire(hotbar, ("build", build));
             Wire(beltItems, ("bootstrap", bootstrap), ("worldCamera", camera));
+            Wire(sound, ("bootstrap", bootstrap), ("build", build));
             Wire(panels, ("bootstrap", bootstrap), ("build", build));
             Wire(netGame, ("bootstrap", bootstrap), ("network", network), ("transport", transport),
                 ("avatarPrefab", avatarPrefab), ("cameraRig", rig), ("build", build));
-            Wire(menu, ("game", netGame), ("bootstrap", bootstrap), ("build", build), ("panels", panels));
-            Wire(launcher, ("game", netGame), ("bootstrap", bootstrap), ("panels", panels), ("cameraRig", rig));
+            Wire(menu, ("game", netGame), ("bootstrap", bootstrap), ("build", build), ("panels", panels), ("hud", hotbar));
+            Wire(launcher, ("game", netGame), ("bootstrap", bootstrap), ("panels", panels), ("cameraRig", rig), ("menu", menu));
 
             EditorSceneManager.SaveScene(scene, ScenePath);
             EditorBuildSettings.scenes = new[] { new EditorBuildSettingsScene(ScenePath, true) };

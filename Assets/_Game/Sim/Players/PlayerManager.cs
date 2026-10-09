@@ -19,6 +19,9 @@ namespace Cogworks.Sim
 
         public event Action<PlayerState> Joined;
 
+        /// <summary>Presentation hook: a player's hand craft finished.</summary>
+        public event Action<PlayerState, Recipe> CraftCompleted;
+
         public PlayerState Get(byte id) => id < MaxPlayers ? _players[id] : null;
 
         public IEnumerable<PlayerState> All
@@ -42,7 +45,11 @@ namespace Cogworks.Sim
 
         internal void Tick()
         {
-            foreach (var p in _players) p?.Tick();
+            foreach (var p in _players)
+            {
+                var done = p?.Tick();
+                if (done != null) CraftCompleted?.Invoke(p, done);
+            }
         }
 
         internal void Write(BinaryWriter w)

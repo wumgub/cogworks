@@ -39,25 +39,29 @@ namespace Cogworks.Sim
             Inventory.Insert(BuildingCatalog.Chest.ItemId, 2);
         }
 
-        /// <summary>Advances the front of the craft queue; finished items wait if the inventory is full.</summary>
-        internal void Tick()
+        /// <summary>
+        /// Advances the front of the craft queue; finished items wait if the inventory is full.
+        /// Returns the recipe that completed this tick, if any.
+        /// </summary>
+        internal Recipe Tick()
         {
-            if (CraftQueue.Count == 0) return;
+            if (CraftQueue.Count == 0) return null;
             var recipe = RecipeCatalog.Get(CraftQueue[0]);
             if (recipe == null)
             {
                 CraftQueue.RemoveAt(0);
-                return;
+                return null;
             }
             if (CraftProgress < recipe.Ticks)
             {
                 CraftProgress++;
-                return;
+                return null;
             }
-            if (!Inventory.CanInsert(recipe.Output.Item, recipe.Output.Count)) return;
+            if (!Inventory.CanInsert(recipe.Output.Item, recipe.Output.Count)) return null;
             Inventory.Insert(recipe.Output.Item, recipe.Output.Count);
             CraftQueue.RemoveAt(0);
             CraftProgress = 0;
+            return recipe;
         }
 
         internal void Write(BinaryWriter w)

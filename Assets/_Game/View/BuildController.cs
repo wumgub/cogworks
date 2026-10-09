@@ -151,7 +151,10 @@ namespace Cogworks.View
             }
 
             if (kb.eKey.wasPressedThisFrame && Hovered?.Spec == BuildingCatalog.HandCrank)
+            {
                 bootstrap.Commands.Submit(new CrankCommand(Hovered.Origin));
+                SoundFx.Instance?.Play(Sfx.Crank);
+            }
 
             if (kb.rKey.wasPressedThisFrame)
             {
@@ -184,6 +187,7 @@ namespace Cogworks.View
             if (Time.time < _nextMineTime) return;
             _nextMineTime = Time.time + MineInterval;
             bootstrap.Commands.Submit(new MineTileCommand(cursor));
+            SoundFx.Instance?.Play(Sfx.Mine, 0.6f);
         }
 
         void HandlePlacing(Mouse mouse, Int2 cursor, bool overUi)
@@ -232,6 +236,7 @@ namespace Cogworks.View
                 if (Time.time >= _nextOutOfItemMessage)
                 {
                     Message?.Invoke($"Out of {spec.DisplayName}. Craft more (Tab).");
+                    SoundFx.Instance?.Play(Sfx.Error, 0.5f);
                     _nextOutOfItemMessage = Time.time + 2f;
                 }
                 return;

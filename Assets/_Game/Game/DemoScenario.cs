@@ -141,6 +141,30 @@ namespace Cogworks.Game
             Application.Quit();
         }
 
+        public static IEnumerator CaptureMenuShots(string dir, MenuController menu, CameraRig rig)
+        {
+            Directory.CreateDirectory(dir);
+            var cam = rig.GetComponent<Camera>();
+            var worldRT = new RenderTexture(1280, 720, 24, RenderTextureFormat.ARGB32);
+            var uiRT = new RenderTexture(1280, 720, 24, RenderTextureFormat.ARGB32);
+            cam.targetTexture = worldRT;
+            foreach (var doc in Object.FindObjectsByType<UnityEngine.UIElements.UIDocument>(FindObjectsInactive.Exclude))
+            {
+                doc.panelSettings.targetTexture = uiRT;
+                doc.panelSettings.clearColor = true;
+                doc.panelSettings.colorClearValue = new Color(0, 0, 0, 0);
+            }
+            yield return Wait(1f);
+            yield return Shot(Path.Combine(dir, "menu_main.png"), cam, worldRT, uiRT);
+            menu.ShowOverlayByName("help");
+            yield return Wait(0.5f);
+            yield return Shot(Path.Combine(dir, "menu_help.png"), cam, worldRT, uiRT);
+            menu.ShowOverlayByName("settings");
+            yield return Wait(0.5f);
+            yield return Shot(Path.Combine(dir, "menu_settings.png"), cam, worldRT, uiRT);
+            Application.Quit();
+        }
+
         // Frame-counted rather than wall-clock so throttled or headless players still progress.
         static IEnumerator Wait(float seconds)
         {

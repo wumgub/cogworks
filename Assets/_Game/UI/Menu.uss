@@ -160,3 +160,41 @@
     color: rgb(200, 202, 210);
     min-width: 0;
 }
+
+.code {
+    font-size: 18px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    color: rgb(140, 210, 255);
+    letter-spacing: 3px;
+    background-color: rgb(20, 22, 28);
+    border-radius: 3px;
+    height: 32px;
+    margin: 3px 0;
+}
+
+.setting {
+    margin: 6px 0;
+}
+
+.setting Label {
+    color: rgb(210, 212, 220);
+    min-width: 110px;
+    font-size: 12px;
+}
+
+.panel--help {
+    width: 560px;
+    max-height: 90%;
+}
+
+.help-scroll {
+    max-height: 440px;
+    margin: 6px 0;
+}
+
+.help-text {
+    white-space: normal;
+    font-size: 13px;
+    color: rgb(220, 222, 230);
+}
