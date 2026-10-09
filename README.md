@@ -25,11 +25,17 @@
 Pick your platform and paste one line. It downloads the latest release, installs it for your user (no admin or
 sudo needed), and starts the game.
 
-| Platform | One-line install |
-|---|---|
-| **macOS** (Apple Silicon and Intel) | `curl -fsSL https://raw.githubusercontent.com/wumgub/cogworks/main/install.sh \| sh` |
-| **Linux** (x86-64) | `curl -fsSL https://raw.githubusercontent.com/wumgub/cogworks/main/install.sh \| sh` |
-| **Windows** 10/11 (PowerShell) | `irm https://raw.githubusercontent.com/wumgub/cogworks/main/install.ps1 \| iex` |
+**macOS** (Apple Silicon and Intel) and **Linux** (x86-64): paste into Terminal
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/wumgub/cogworks/main/install.sh | sh
+```
+
+**Windows** 10/11: paste into PowerShell
+
+```powershell
+irm https://raw.githubusercontent.com/wumgub/cogworks/main/install.ps1 | iex
+```
 
 <details>
 <summary><b>Prefer to download it yourself?</b></summary>
