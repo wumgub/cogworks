@@ -1,10 +1,10 @@
 #!/bin/sh
 # Cogworks installer for macOS and Linux.
-#   curl -fsSL https://raw.githubusercontent.com/EVL2020/cogworks/main/install.sh | sh
+#   curl -fsSL https://raw.githubusercontent.com/wumgub/cogworks/main/install.sh | sh
 # Downloads the latest release, installs it for the current user (no sudo) and launches it.
 set -e
 
-REPO="EVL2020/cogworks"
+REPO="wumgub/cogworks"
 BASE="https://github.com/$REPO/releases/latest/download"
 TMP="$(mktemp -d)"
 trap 'rm -rf "$TMP"' EXIT

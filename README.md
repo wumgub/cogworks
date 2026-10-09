@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/EVL2020/cogworks/releases/latest"><img src="https://img.shields.io/github/v/release/EVL2020/cogworks?label=download&color=b8862e&style=for-the-badge" alt="Download"></a>
+  <a href="https://github.com/wumgub/cogworks/releases/latest"><img src="https://img.shields.io/github/v/release/wumgub/cogworks?label=download&color=b8862e&style=for-the-badge" alt="Download"></a>
   <img src="https://img.shields.io/badge/platforms-macOS%20%7C%20Windows%20%7C%20Linux-5a6068?style=for-the-badge" alt="Platforms">
   <img src="https://img.shields.io/badge/co--op-1--4%20players-3a7a3e?style=for-the-badge" alt="Co-op 1-4 players">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-GPL--3.0-8c4428?style=for-the-badge" alt="GPL-3.0"></a>
@@ -27,14 +27,14 @@ sudo needed), and starts the game.
 
 | Platform | One-line install |
 |---|---|
-| **macOS** (Apple Silicon and Intel) | `curl -fsSL https://raw.githubusercontent.com/EVL2020/cogworks/main/install.sh \| sh` |
-| **Linux** (x86-64) | `curl -fsSL https://raw.githubusercontent.com/EVL2020/cogworks/main/install.sh \| sh` |
-| **Windows** 10/11 (PowerShell) | `irm https://raw.githubusercontent.com/EVL2020/cogworks/main/install.ps1 \| iex` |
+| **macOS** (Apple Silicon and Intel) | `curl -fsSL https://raw.githubusercontent.com/wumgub/cogworks/main/install.sh \| sh` |
+| **Linux** (x86-64) | `curl -fsSL https://raw.githubusercontent.com/wumgub/cogworks/main/install.sh \| sh` |
+| **Windows** 10/11 (PowerShell) | `irm https://raw.githubusercontent.com/wumgub/cogworks/main/install.ps1 \| iex` |
 
 <details>
 <summary><b>Prefer to download it yourself?</b></summary>
 
-Grab the archive for your system from the [latest release](https://github.com/EVL2020/cogworks/releases/latest):
+Grab the archive for your system from the [latest release](https://github.com/wumgub/cogworks/releases/latest):
 
 | File | What to do |
 |---|---|

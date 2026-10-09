@@ -1,11 +1,11 @@
 # Cogworks installer for Windows.
-#   irm https://raw.githubusercontent.com/EVL2020/cogworks/main/install.ps1 | iex
+#   irm https://raw.githubusercontent.com/wumgub/cogworks/main/install.ps1 | iex
 # Downloads the latest release into %LOCALAPPDATA%\Cogworks (no admin needed), adds Start Menu and
 # Desktop shortcuts, and launches the game.
 $ErrorActionPreference = 'Stop'
 $ProgressPreference = 'SilentlyContinue'   # Invoke-WebRequest is far faster without the progress bar
 
-$repo = 'EVL2020/cogworks'
+$repo = 'wumgub/cogworks'
 $dest = Join-Path $env:LOCALAPPDATA 'Cogworks'
 $zip = Join-Path $env:TEMP 'Cogworks-Windows.zip'
 
