@@ -14,7 +14,9 @@ namespace Cogworks.Editor
             var importer = (TextureImporter)assetImporter;
             importer.textureType = TextureImporterType.Sprite;
             importer.spriteImportMode = SpriteImportMode.Single;
-            importer.spritePixelsPerUnit = 16;
+            // World sprites: 16 px per tile. UI skin: 100, UI Toolkit's reference, so 9-slice borders scale
+            // exactly by -unity-slice-scale instead of by 100/16.
+            importer.spritePixelsPerUnit = assetPath.StartsWith(ArtRoot + "UI/") ? 100 : 16;
             importer.filterMode = FilterMode.Point;
             importer.textureCompression = TextureImporterCompression.Uncompressed;
             importer.mipmapEnabled = false;

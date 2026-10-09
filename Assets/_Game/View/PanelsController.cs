@@ -24,6 +24,8 @@ namespace Cogworks.View
         }
 
         const float RefreshInterval = 0.1f;
+        // Slot width plus margins (see .item-slot in Panels.uss).
+        const float SlotPitch = 38f;
 
         [SerializeField] GameBootstrap bootstrap;
         [SerializeField] BuildController build;
@@ -285,7 +287,7 @@ namespace Cogworks.View
             {
                 case ChestLogic _:
                 {
-                    var grid = new SlotGrid(_machineBody, 16);
+                    var grid = new SlotGrid(Grid(8), 16);
                     grid.Clicked += (i, _) => TakeOut(grid.ItemAt(i), grid.CountAt(i));
                     return (sim, bb) => grid.Show(((ChestLogic)bb.Logic).Inventory);
                 }
@@ -406,8 +408,7 @@ namespace Cogworks.View
                     return null;
                 case LabLogic _:
                 {
-                    var row = Row();
-                    var packs = new SlotGrid(row, 2);
+                    var packs = new SlotGrid(Grid(8), 2);
                     packs.Clicked += (i, _) => TakeOut(packs.ItemAt(i), packs.CountAt(i));
                     var current = new Label();
                     current.AddToClassList("status-line");
@@ -446,6 +447,16 @@ namespace Cogworks.View
             }
         }
 
+        /// <summary>A wrapping grid in the machine body, <paramref name="columns"/> slots wide.</summary>
+        VisualElement Grid(int columns)
+        {
+            var grid = new VisualElement();
+            grid.AddToClassList("grid");
+            grid.style.width = columns * SlotPitch;
+            _machineBody.Add(grid);
+            return grid;
+        }
+
         VisualElement Row()
         {
             var row = new VisualElement();
@@ -458,6 +469,7 @@ namespace Cogworks.View
         {
             var l = new Label(text);
             l.AddToClassList("section-label");
+            l.AddToClassList("gear-heading");
             return l;
         }
 

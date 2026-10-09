@@ -49,8 +49,8 @@ namespace Cogworks.Sim
         /// <summary>Blocks player movement. Conveyors are walkable so players can step over them.</summary>
         public readonly bool Solid;
         /// <summary>
-        /// Lives on the overhead layer (shafts): can share a tile with a belt underneath, but never with
-        /// a machine.
+        /// Lives on the overhead layer (shafts, gearboxes): can share a tile with a belt underneath, but never
+        /// with a machine.
         /// </summary>
         public readonly bool Overhead;
 

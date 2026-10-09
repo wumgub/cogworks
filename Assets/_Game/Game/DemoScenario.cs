@@ -110,11 +110,18 @@ namespace Cogworks.Game
             yield return Wait(1f);
             yield return Shot(Path.Combine(dir, "2_inventory.png"), cam, worldRT, uiRT);
 
-            Building assembler = null, furnace = null;
+            Building assembler = null, furnace = null, chest = null;
             foreach (var b in bootstrap.Sim.World.Buildings.All)
             {
                 if (b.Spec == BuildingCatalog.Assembler) assembler = b;
                 if (b.Spec == BuildingCatalog.Furnace) furnace = b;
+                if (b.Spec == BuildingCatalog.Chest) chest = b;
+            }
+            if (chest != null)
+            {
+                panels.OpenMachine(chest);
+                yield return Wait(1f);
+                yield return Shot(Path.Combine(dir, "3b_chest.png"), cam, worldRT, uiRT);
             }
             if (assembler != null)
             {

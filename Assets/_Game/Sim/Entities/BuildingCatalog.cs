@@ -20,7 +20,7 @@ namespace Cogworks.Sim
         public static readonly BuildingSpec HandCrank = new BuildingSpec(8, "hand_crank", "Hand Crank", BuildingKind.Generator, 1, 1,
             rotatable: false).AsGenerator(rpm: 32, capacity: 160);
         public static readonly BuildingSpec Gearbox = new BuildingSpec(9, "gearbox", "Gearbox", BuildingKind.Gearbox, 1, 1,
-            rotatable: false).AsKinetic(KineticRole.Gearbox);
+            rotatable: false, solid: false, overhead: true).AsKinetic(KineticRole.Gearbox);
         public static readonly BuildingSpec WaterWheel = new BuildingSpec(10, "water_wheel", "Water Wheel", BuildingKind.Generator, 1, 1,
             rotatable: false, requiresAdjacentWater: true).AsGenerator(rpm: 32, capacity: 512);
         public static readonly BuildingSpec SteamEngine = new BuildingSpec(11, "steam_engine", "Steam Engine", BuildingKind.Generator, 2, 2,

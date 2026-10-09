@@ -267,7 +267,7 @@ WASD moves. Scroll zooms. Number keys 1-9 and 0 pick a building; R rotates it (S
 3. Click any building to open it, and click items to move them in or out.
 
 <b>Rotational power</b>
-Drills and assemblers need rotation, like in Create. Generators make it: a Hand Crank turns for 5 seconds each time you press E on it, a Water Wheel (placed next to water) turns forever, and a Steam Engine burns coal. Shafts carry rotation in a straight line and run overhead, so they can cross over belts (and you can walk under them); Gearboxes connect all four sides. Machines next to each other share power too.
+Drills and assemblers need rotation, like in Create. Generators make it: a Hand Crank turns for 5 seconds each time you press E on it, a Water Wheel (placed next to water) turns forever, and a Steam Engine burns coal. Shafts carry rotation in a straight line and run overhead, so they can cross over belts (and you can walk under them); Gearboxes connect all four sides and can also sit over belts. Machines next to each other share power too.
 Every machine adds stress. If a network needs more stress (SU) than its generators supply, the whole network stops and its cogs turn red. Add generators or split the network.
 
 <b>Logistics</b>

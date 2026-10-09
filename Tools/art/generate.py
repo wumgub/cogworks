@@ -14,9 +14,14 @@ import buildings
 import characters
 import items
 import terrain
+import ttf
+import font_glyphs
+import ui
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 OUT = os.path.join(ROOT, 'Assets', '_Game', 'Art', 'Resources', 'Art')
+# UI skin and font are referenced from USS by path, so they live outside Resources.
+UI_OUT = os.path.join(ROOT, 'Assets', '_Game', 'Art', 'UI')
 
 
 def write(name, canvases, fps, manifest):
@@ -48,6 +53,11 @@ def main():
             write(f'player_{slot}_{d}', [characters.engineer(d, f, slot) for f in range(3)], 8, manifest)
         # Right is an exact mirror of left so the two profiles always match.
         write(f'player_{slot}_right', [characters.engineer('left', f, slot).mirrored() for f in range(3)], 8, manifest)
+
+    os.makedirs(UI_OUT, exist_ok=True)
+    for name, fn in ui.PIECES.items():
+        fn().save(os.path.join(UI_OUT, f'{name}.png'))
+    ttf.write(os.path.join(UI_OUT, 'CogworksPixel.ttf'), font_glyphs.G)
 
     with open(os.path.join(OUT, 'manifest.json'), 'w') as f:
         json.dump(manifest, f, indent=1, sort_keys=True)

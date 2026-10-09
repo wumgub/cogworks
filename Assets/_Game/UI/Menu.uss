@@ -14,48 +14,54 @@
     bottom: 0;
     align-items: center;
     justify-content: center;
-    background-color: rgba(14, 10, 8, 0.72);
+    background-color: rgba(14, 10, 8, 0.78);
 }
 
 .panel {
-    width: 380px;
-    padding: 20px 22px;
-    background-color: rgb(36, 28, 24);
-    border-width: 2px;
-    border-color: rgb(120, 90, 48);
-    border-radius: 6px;
+    width: 440px;
+    padding: 26px 30px 26px 30px;
 }
 
 .panel--small {
-    width: 280px;
+    width: 340px;
+}
+
+.panel--help {
+    width: 640px;
+    max-height: 92%;
+}
+
+.logo {
+    width: 432px;
+    height: 80px;
+    align-self: center;
+    background-image: url("../Art/UI/ui_logo.png");
+    -unity-background-scale-mode: scale-to-fit;
 }
 
 .title {
-    font-size: 34px;
-    -unity-font-style: bold;
+    font-size: 24px;
     -unity-text-align: middle-center;
-    color: rgb(240, 180, 60);
-    letter-spacing: 6px;
+    color: rgb(250, 220, 140);
+    margin-bottom: 4px;
 }
 
 .title--small {
-    font-size: 22px;
-    letter-spacing: 2px;
+    align-self: center;
 }
 
 .subtitle {
     -unity-text-align: middle-center;
-    color: rgb(176, 160, 140);
-    font-size: 12px;
-    margin-bottom: 8px;
+    color: rgb(214, 196, 168);
+    font-size: 8px;
+    margin-bottom: 10px;
 }
 
 .section {
-    margin-top: 12px;
-    margin-bottom: 2px;
-    font-size: 11px;
-    color: rgb(176, 160, 140);
-    -unity-font-style: bold;
+    margin-top: 14px;
+    margin-bottom: 4px;
+    font-size: 8px;
+    color: rgb(226, 190, 120);
 }
 
 .row {
@@ -68,133 +74,88 @@
 }
 
 .btn {
-    height: 32px;
+    height: 36px;
     margin: 3px 0;
-    background-color: rgb(60, 46, 36);
-    border-width: 1px;
-    border-color: rgb(110, 84, 50);
-    border-radius: 3px;
-    color: rgb(238, 230, 218);
-    font-size: 13px;
-}
-
-.row > .field {
-    margin-right: 4px;
 }
 
 .gap-left {
-    margin-left: 4px;
+    margin-left: 6px;
 }
 
-.btn:hover {
-    background-color: rgb(78, 60, 46);
-    border-color: rgb(190, 150, 90);
-}
-
-.btn:active {
-    background-color: rgb(40, 31, 26);
-}
-
-.btn:disabled {
-    opacity: 0.45;
-}
-
-.btn--primary {
-    background-color: rgb(150, 105, 30);
-    border-color: rgb(240, 180, 60);
-    color: rgb(255, 248, 230);
-    -unity-font-style: bold;
-}
-
-.btn--primary:hover {
-    background-color: rgb(175, 125, 40);
+.row > .field {
+    margin-right: 6px;
 }
 
 .btn--quiet {
-    margin-top: 10px;
-    background-color: rgba(0, 0, 0, 0);
-    border-color: rgba(0, 0, 0, 0);
-    color: rgb(176, 160, 140);
+    margin-top: 12px;
+    background-image: none;
+    color: rgb(200, 184, 160);
+}
+
+.btn--quiet:hover {
+    background-image: none;
+    color: rgb(250, 220, 140);
 }
 
 .field {
     margin: 3px 0;
-    height: 32px;
-}
-
-.field > #unity-text-input {
-    background-color: rgb(26, 20, 18);
-    border-color: rgb(110, 84, 50);
-    color: rgb(240, 232, 220);
-    font-size: 13px;
-    padding-left: 8px;
+    height: 36px;
 }
 
 .status {
-    margin-top: 8px;
+    margin-top: 10px;
     min-height: 16px;
     white-space: normal;
     -unity-text-align: middle-center;
-    color: rgb(240, 200, 120);
-    font-size: 12px;
+    color: rgb(250, 210, 130);
+    font-size: 8px;
 }
 
 .session-info {
     position: absolute;
-    top: 8px;
+    top: 10px;
     left: 10px;
-    padding: 4px 8px;
-    background-color: rgba(26, 20, 18, 0.8);
-    border-radius: 3px;
-    color: rgb(238, 230, 218);
-    font-size: 12px;
+    padding: 6px 14px 8px 14px;
+    font-size: 8px;
 }
 
 .toggle {
-    margin: 2px 0 4px 0;
-    color: rgb(214, 204, 188);
-    font-size: 12px;
+    margin: 4px 0;
 }
 
-.toggle > Label {
-    color: rgb(214, 204, 188);
+.toggle Label {
+    color: rgb(226, 214, 192);
+    font-size: 8px;
     min-width: 0;
+    margin-left: 6px;
 }
 
 .code {
-    font-size: 18px;
-    -unity-font-style: bold;
+    font-size: 24px;
     -unity-text-align: middle-center;
-    color: rgb(246, 210, 120);
-    letter-spacing: 3px;
-    background-color: rgb(26, 20, 18);
-    border-radius: 3px;
-    height: 32px;
+    color: rgb(250, 220, 140);
+    letter-spacing: 4px;
+    height: 40px;
     margin: 3px 0;
 }
 
 .setting {
-    margin: 6px 0;
+    margin: 8px 0;
 }
 
 .setting Label {
-    color: rgb(224, 212, 196);
-    min-width: 110px;
-    font-size: 12px;
-}
-
-.panel--help {
-    width: 560px;
-    max-height: 90%;
+    color: rgb(226, 214, 192);
+    min-width: 130px;
+    font-size: 8px;
 }
 
 .help-scroll {
-    max-height: 440px;
-    margin: 6px 0;
+    max-height: 460px;
+    margin: 8px 0;
 }
 
 .help-text {
     white-space: normal;
-    font-size: 13px;
-    color: rgb(230, 220, 206);
+    font-size: 8px;
+    color: rgb(236, 224, 202);
 }

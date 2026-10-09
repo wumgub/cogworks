@@ -180,8 +180,8 @@ namespace Cogworks.Editor
             settings.themeStyleSheet = AssetDatabase.LoadAssetAtPath<ThemeStyleSheet>(UiDir + "/GameTheme.tss");
             settings.scaleMode = PanelScaleMode.ScaleWithScreenSize;
             settings.referenceResolution = new Vector2Int(1280, 720);
-            settings.screenMatchMode = PanelScreenMatchMode.MatchWidthOrHeight;
-            settings.match = 0.5f;
+            // Shrink: the whole 1280x720 layout always fits, whatever the window's shape.
+            settings.screenMatchMode = PanelScreenMatchMode.Shrink;
             EditorUtility.SetDirty(settings);
             AssetDatabase.SaveAssets();
             return settings;

@@ -1,21 +1,22 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="Skin.uss" />
     <Style src="Menu.uss" />
-    <ui:VisualElement name="menu-root" class="menu-root" picking-mode="Ignore">
-        <ui:Label name="session-info" class="session-info" picking-mode="Ignore" />
+    <ui:VisualElement name="menu-root" class="menu-root skin-root" picking-mode="Ignore">
+        <ui:Label name="session-info" class="session-info frame-small" picking-mode="Ignore" />
 
         <ui:VisualElement name="main-menu" class="overlay">
-            <ui:VisualElement class="panel">
-                <ui:Label text="COGWORKS" class="title" />
+            <ui:VisualElement class="panel frame-window">
+                <ui:VisualElement class="logo" />
                 <ui:Label text="automate everything" class="subtitle" />
 
-                <ui:Label text="Single player" class="section" />
+                <ui:Label text="Single player" class="section gear-heading" />
                 <ui:Toggle name="new-sandbox" label="Sandbox (free building, no costs)" class="toggle" />
                 <ui:VisualElement class="row">
                     <ui:Button name="new-world" text="New World" class="btn btn--primary grow" />
                     <ui:Button name="continue" text="Continue" class="btn grow gap-left" />
                 </ui:VisualElement>
 
-                <ui:Label text="Multiplayer (up to 4 players)" class="section" />
+                <ui:Label text="Multiplayer (up to 4 players)" class="section gear-heading" />
                 <ui:Toggle name="host-saved" label="Host my saved world" class="toggle" />
                 <ui:Button name="host-online" text="Host Online Game" class="btn" />
                 <ui:VisualElement class="row">
@@ -23,7 +24,7 @@
                     <ui:Button name="join-online" text="Join by Code" class="btn" />
                 </ui:VisualElement>
 
-                <ui:Label text="Local network / direct IP" class="section" />
+                <ui:Label text="Local network / direct IP" class="section gear-heading" />
                 <ui:Button name="host-lan" text="Host LAN Game" class="btn" />
                 <ui:VisualElement class="row">
                     <ui:TextField name="join-address" class="field grow" value="127.0.0.1" />
@@ -40,11 +41,11 @@
         </ui:VisualElement>
 
         <ui:VisualElement name="pause-menu" class="overlay">
-            <ui:VisualElement class="panel panel--small">
-                <ui:Label text="Paused" class="title title--small" />
+            <ui:VisualElement class="panel panel--small frame-window">
+                <ui:Label text="Paused" class="title title--small plaque" />
                 <ui:Label name="pause-note" class="subtitle" />
                 <ui:VisualElement name="join-code-box" class="row">
-                    <ui:Label name="pause-join-code" class="code grow" />
+                    <ui:Label name="pause-join-code" class="code grow frame-small" />
                     <ui:Button name="copy-code" text="Copy" class="btn gap-left" />
                 </ui:VisualElement>
                 <ui:Button name="resume" text="Resume" class="btn btn--primary" />
@@ -59,8 +60,8 @@
         </ui:VisualElement>
 
         <ui:VisualElement name="settings-menu" class="overlay">
-            <ui:VisualElement class="panel panel--small">
-                <ui:Label text="Settings" class="title title--small" />
+            <ui:VisualElement class="panel panel--small frame-window">
+                <ui:Label text="Settings" class="title title--small plaque" />
                 <ui:Slider name="master-volume" label="Master volume" low-value="0" high-value="1" class="setting" />
                 <ui:Slider name="sfx-volume" label="Effects volume" low-value="0" high-value="1" class="setting" />
                 <ui:Toggle name="fullscreen" label="Fullscreen" class="toggle setting" />
@@ -69,8 +70,8 @@
         </ui:VisualElement>
 
         <ui:VisualElement name="help-menu" class="overlay">
-            <ui:VisualElement class="panel panel--help">
-                <ui:Label text="How to Play" class="title title--small" />
+            <ui:VisualElement class="panel panel--help frame-window">
+                <ui:Label text="How to Play" class="title title--small plaque" />
                 <ui:ScrollView class="help-scroll">
                     <ui:Label name="help-text" class="help-text" />
                 </ui:ScrollView>

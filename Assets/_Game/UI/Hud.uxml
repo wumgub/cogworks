@@ -1,15 +1,16 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="Skin.uss" />
     <Style src="Hud.uss" />
-    <ui:VisualElement name="minimap" class="minimap" picking-mode="Ignore">
+    <ui:VisualElement name="minimap" class="minimap frame-small skin-root" picking-mode="Ignore">
         <ui:VisualElement name="minimap-image" class="minimap-image" picking-mode="Ignore" />
         <ui:Label name="minimap-coords" class="minimap-coords" picking-mode="Ignore" />
     </ui:VisualElement>
-    <ui:VisualElement name="hud-root" class="hud-root" picking-mode="Ignore">
-        <ui:Label name="toast" class="toast" picking-mode="Ignore" />
+    <ui:VisualElement name="hud-root" class="hud-root skin-root" picking-mode="Ignore">
+        <ui:Label name="toast" class="toast frame-small" picking-mode="Ignore" />
         <ui:VisualElement class="spacer" picking-mode="Ignore" />
-        <ui:Label name="hover-info" class="hover-info" picking-mode="Ignore" />
-        <ui:Label name="selected-name" class="selected-name" picking-mode="Ignore" />
-        <ui:VisualElement name="hotbar" class="hotbar" />
+        <ui:Label name="hover-info" class="hover-info frame-small" picking-mode="Ignore" />
+        <ui:Label name="selected-name" class="selected-name plaque" picking-mode="Ignore" />
+        <ui:VisualElement name="hotbar" class="hotbar frame-window" />
         <ui:Label name="hint" class="hint" picking-mode="Ignore"
                   text="1-0 tools · R rotate · Q clear/pipette · E crank · LMB place / open / mine · RMB remove · Tab inventory · T research · M map zoom" />
     </ui:VisualElement>

@@ -125,6 +125,7 @@ namespace Cogworks.View
             for (int i = 0; i < _slots.Length; i++)
                 _slots[i].EnableInClassList(SelectedClass, BuildController.HotbarSlots[i] == build.Selected);
             _selectedName.text = build.Selected?.DisplayName ?? "";
+            _selectedName.style.display = build.Selected != null ? DisplayStyle.Flex : DisplayStyle.None;
         }
 
         /// <summary>True when the screen-space pointer is over an interactive element of any game UI panel.</summary>
