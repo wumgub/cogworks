@@ -1,0 +1,21 @@
+{
+    "name": "Cogworks.Editor",
+    "rootNamespace": "Cogworks.Editor",
+    "references": [
+        "Cogworks.Sim",
+        "Cogworks.View",
+        "Unity.RenderPipelines.Universal.Runtime",
+        "Unity.RenderPipelines.Universal.2D.Runtime"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
