@@ -14,15 +14,15 @@
     bottom: 0;
     align-items: center;
     justify-content: center;
-    background-color: rgba(12, 13, 17, 0.72);
+    background-color: rgba(14, 10, 8, 0.72);
 }
 
 .panel {
     width: 380px;
     padding: 20px 22px;
-    background-color: rgb(28, 31, 38);
+    background-color: rgb(36, 28, 24);
     border-width: 2px;
-    border-color: rgb(66, 70, 82);
+    border-color: rgb(120, 90, 48);
     border-radius: 6px;
 }
 
@@ -45,7 +45,7 @@
 
 .subtitle {
     -unity-text-align: middle-center;
-    color: rgb(150, 154, 166);
+    color: rgb(176, 160, 140);
     font-size: 12px;
     margin-bottom: 8px;
 }
@@ -54,7 +54,7 @@
     margin-top: 12px;
     margin-bottom: 2px;
     font-size: 11px;
-    color: rgb(150, 154, 166);
+    color: rgb(176, 160, 140);
     -unity-font-style: bold;
 }
 
@@ -70,11 +70,11 @@
 .btn {
     height: 32px;
     margin: 3px 0;
-    background-color: rgb(46, 50, 60);
+    background-color: rgb(60, 46, 36);
     border-width: 1px;
-    border-color: rgb(80, 85, 98);
+    border-color: rgb(110, 84, 50);
     border-radius: 3px;
-    color: rgb(230, 230, 236);
+    color: rgb(238, 230, 218);
     font-size: 13px;
 }
 
@@ -87,12 +87,12 @@
 }
 
 .btn:hover {
-    background-color: rgb(60, 65, 78);
-    border-color: rgb(130, 136, 150);
+    background-color: rgb(78, 60, 46);
+    border-color: rgb(190, 150, 90);
 }
 
 .btn:active {
-    background-color: rgb(36, 39, 47);
+    background-color: rgb(40, 31, 26);
 }
 
 .btn:disabled {
@@ -114,7 +114,7 @@
     margin-top: 10px;
     background-color: rgba(0, 0, 0, 0);
     border-color: rgba(0, 0, 0, 0);
-    color: rgb(150, 154, 166);
+    color: rgb(176, 160, 140);
 }
 
 .field {
@@ -123,9 +123,9 @@
 }
 
 .field > #unity-text-input {
-    background-color: rgb(20, 22, 28);
-    border-color: rgb(80, 85, 98);
-    color: rgb(235, 235, 240);
+    background-color: rgb(26, 20, 18);
+    border-color: rgb(110, 84, 50);
+    color: rgb(240, 232, 220);
     font-size: 13px;
     padding-left: 8px;
 }
@@ -144,20 +144,20 @@
     top: 8px;
     right: 10px;
     padding: 4px 8px;
-    background-color: rgba(20, 22, 28, 0.8);
+    background-color: rgba(26, 20, 18, 0.8);
     border-radius: 3px;
-    color: rgb(230, 230, 236);
+    color: rgb(238, 230, 218);
     font-size: 12px;
 }
 
 .toggle {
     margin: 2px 0 4px 0;
-    color: rgb(200, 202, 210);
+    color: rgb(214, 204, 188);
     font-size: 12px;
 }
 
 .toggle > Label {
-    color: rgb(200, 202, 210);
+    color: rgb(214, 204, 188);
     min-width: 0;
 }
 
@@ -165,9 +165,9 @@
     font-size: 18px;
     -unity-font-style: bold;
     -unity-text-align: middle-center;
-    color: rgb(140, 210, 255);
+    color: rgb(246, 210, 120);
     letter-spacing: 3px;
-    background-color: rgb(20, 22, 28);
+    background-color: rgb(26, 20, 18);
     border-radius: 3px;
     height: 32px;
     margin: 3px 0;
@@ -178,7 +178,7 @@
 }
 
 .setting Label {
-    color: rgb(210, 212, 220);
+    color: rgb(224, 212, 196);
     min-width: 110px;
     font-size: 12px;
 }
@@ -196,5 +196,5 @@
 .help-text {
     white-space: normal;
     font-size: 13px;
-    color: rgb(220, 222, 230);
+    color: rgb(230, 220, 206);
 }

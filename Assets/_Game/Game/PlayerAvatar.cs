@@ -28,9 +28,10 @@ namespace Cogworks.Game
         void Setup(bool isLocal, int slot)
         {
             Controller.IsLocal = isLocal;
-            GetComponent<SpriteRenderer>().sprite = PlaceholderArt.PlayerSprite(slot);
+            GetComponent<SpriteRenderer>().sprite = GameArt.PlayerSprite(slot);
+            if (TryGetComponent<PlayerSpriteAnimator>(out var animator)) animator.Slot = slot;
             // Local avatar draws above others so you can always find yourself.
-            GetComponent<SpriteRenderer>().sortingOrder = isLocal ? 11 : 10;
+            GetComponent<SpriteRenderer>().sortingOrder = isLocal ? 16 : 15;
             if (isLocal) LocalSpawned?.Invoke(this);
         }
     }

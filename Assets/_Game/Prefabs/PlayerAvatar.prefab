@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 2109561567573401041}
   - component: {fileID: 7590930655444207354}
   - component: {fileID: 6365334243444130506}
+  - component: {fileID: 2723170899611565690}
   - component: {fileID: 6004893731758682190}
   - component: {fileID: 5360350019555858981}
   - component: {fileID: 4400426584676483846}
@@ -83,7 +84,7 @@ SpriteRenderer:
   m_GlobalIlluminationMeshLod: 0
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 10
+  m_SortingOrder: 15
   m_MaskInteraction: 0
   m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -111,6 +112,18 @@ MonoBehaviour:
   bootstrap: {fileID: 0}
   speed: 6
   radius: 0.3
+--- !u!114 &2723170899611565690
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4235948277138722106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 00e3775d908a64a0a803c2bce3eeea16, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Cogworks.View::Cogworks.View.PlayerSpriteAnimator
 --- !u!114 &6004893731758682190
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -123,7 +136,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 4263694552
+  GlobalObjectIdHash: 1689951942
   InScenePlacedSourceGlobalObjectIdHash: 0
   m_InScenePlacedDisabledByDefault: 0
   DeferredDespawnTick: 0

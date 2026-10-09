@@ -177,7 +177,7 @@ namespace Cogworks.View
                 var recipe = RecipeCatalog.Get(player.CraftQueue[i]);
                 if (recipe == null) continue;
                 var slot = SlotGrid.MakeSlot(out var icon, out var count);
-                icon.style.backgroundImage = new StyleBackground(PlaceholderArt.ItemSprite(recipe.Output.Item));
+                icon.style.backgroundImage = new StyleBackground(GameArt.ItemSprite(recipe.Output.Item));
                 count.text = i == 0 ? $"{100 * player.CraftProgress / Math.Max(1, recipe.Ticks)}%" : "";
                 slot.tooltip = recipe.DisplayName;
                 _craftQueue.Add(slot);
@@ -212,7 +212,7 @@ namespace Cogworks.View
                 _row.AddToClassList("craft-row");
                 var icon = new VisualElement();
                 icon.AddToClassList("item-icon");
-                icon.style.backgroundImage = new StyleBackground(PlaceholderArt.ItemSprite(recipe.Output.Item));
+                icon.style.backgroundImage = new StyleBackground(GameArt.ItemSprite(recipe.Output.Item));
                 _row.Add(icon);
 
                 var text = new VisualElement();
@@ -322,7 +322,7 @@ namespace Cogworks.View
                         btn.AddToClassList("recipe-btn");
                         var icon = new VisualElement { pickingMode = PickingMode.Ignore };
                         icon.AddToClassList("item-icon");
-                        icon.style.backgroundImage = new StyleBackground(PlaceholderArt.ItemSprite(r.Output.Item));
+                        icon.style.backgroundImage = new StyleBackground(GameArt.ItemSprite(r.Output.Item));
                         btn.Add(icon);
                         var recipe = r;
                         btn.RegisterCallback<ClickEvent>(_ =>
@@ -618,7 +618,7 @@ namespace Cogworks.View
             if (_items[i] != item)
             {
                 _items[i] = item;
-                _icons[i].style.backgroundImage = item == ItemCatalog.None ? new StyleBackground() : new StyleBackground(PlaceholderArt.ItemSprite(item));
+                _icons[i].style.backgroundImage = item == ItemCatalog.None ? new StyleBackground() : new StyleBackground(GameArt.ItemSprite(item));
                 _slots[i].tooltip = item == ItemCatalog.None ? "" : ItemCatalog.NameOf(item);
             }
             if (_amounts[i] != count)

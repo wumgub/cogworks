@@ -10,7 +10,7 @@ namespace Cogworks.View
     /// </summary>
     public sealed class BeltItemsView : MonoBehaviour
     {
-        const int SortingOrder = 7;
+        const int SortingOrder = 12;
         const float ItemScale = 0.5f;
 
         [SerializeField] GameBootstrap bootstrap;
@@ -74,7 +74,7 @@ namespace Cogworks.View
                 _pool.Add(sr);
             }
             var r = _pool[_used++];
-            r.sprite = PlaceholderArt.ItemSprite(item);
+            r.sprite = GameArt.ItemSprite(item);
             r.transform.localPosition = new Vector3(at.x, at.y, 0f);
             if (!r.enabled) r.enabled = true;
         }

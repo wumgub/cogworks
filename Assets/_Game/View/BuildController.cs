@@ -29,7 +29,7 @@ namespace Cogworks.View
 
         static readonly Color GhostValid = new Color(0.55f, 1f, 0.55f, 0.65f);
         static readonly Color GhostInvalid = new Color(1f, 0.35f, 0.35f, 0.65f);
-        const int GhostSortingOrder = 20;
+        const int GhostSortingOrder = 30;
         // Client-side pacing for hand mining; the sim enforces its own cooldown.
         const float MineInterval = 0.35f;
 
@@ -268,7 +268,7 @@ namespace Cogworks.View
             if (!_ghost.enabled) return;
 
             Int2 origin = OriginFor(spec, cursor, Direction);
-            _ghost.sprite = PlaceholderArt.BuildingSprite(spec);
+            _ghost.sprite = GameArt.BuildingSprite(spec);
             _ghost.color = CanPlaceLocally(spec, origin) && Available(spec) > 0 ? GhostValid : GhostInvalid;
             BuildingsView.Pose(_ghost.transform, spec, origin, Direction);
         }

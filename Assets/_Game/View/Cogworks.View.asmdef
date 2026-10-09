@@ -5,6 +5,7 @@
         "Cogworks.Sim",
         "Cogworks.Net",
         "Unity.InputSystem",
+        "Unity.2D.Tilemap.Extras",
         "Unity.RenderPipelines.Universal.Runtime",
         "Unity.RenderPipelines.Universal.2D.Runtime"
     ],

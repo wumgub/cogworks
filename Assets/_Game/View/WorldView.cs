@@ -11,6 +11,8 @@ namespace Cogworks.View
         [SerializeField] GameBootstrap bootstrap;
         [SerializeField] Tilemap terrainMap;
         [SerializeField] Tilemap oreMap;
+        [Tooltip("One border overlay layer per entry in TerrainBlend.Order (index 0, water, is unused).")]
+        [SerializeField] Tilemap[] blendMaps;
         [SerializeField] Transform focus;
         [Tooltip("Chunks within this many chunks of the focus are drawn.")]
         [SerializeField] int loadRadius = 2;
@@ -22,6 +24,7 @@ namespace Cogworks.View
         readonly Vector3Int[] _positions = new Vector3Int[Chunk.Area];
         readonly TileBase[] _terrainTiles = new TileBase[Chunk.Area];
         readonly TileBase[] _oreTiles = new TileBase[Chunk.Area];
+        readonly TileBase[][] _blendTiles = CreateBlendBuffers();
         World _world;
 
         void LateUpdate()
@@ -63,27 +66,62 @@ namespace Cogworks.View
         {
             if (!_shown.Contains(World.TileToChunk(tile))) return;
             var pos = new Vector3Int(tile.X, tile.Y, 0);
-            terrainMap.SetTile(pos, PlaceholderArt.TerrainTile(_world.GetTerrain(tile)));
-            oreMap.SetTile(pos, PlaceholderArt.OreTile(_world.GetOre(tile, out _)));
+            terrainMap.SetTile(pos, GameArt.TerrainTile(_world.GetTerrain(tile), tile));
+            oreMap.SetTile(pos, GameArt.OreTile(_world.GetOre(tile, out _), tile));
         }
 
         void ClearAll()
         {
             terrainMap.ClearAllTiles();
             oreMap.ClearAllTiles();
+            if (blendMaps != null)
+                foreach (var map in blendMaps)
+                    if (map != null) map.ClearAllTiles();
             _shown.Clear();
         }
 
         void Show(Chunk chunk)
         {
             FillPositions(chunk.Coord);
+            Int2 origin = chunk.Origin;
             for (int i = 0; i < Chunk.Area; i++)
             {
-                _terrainTiles[i] = PlaceholderArt.TerrainTile(chunk.Terrain[i]);
-                _oreTiles[i] = PlaceholderArt.OreTile(chunk.Ore[i]);
+                var at = new Int2(origin.X + i % Chunk.Size, origin.Y + i / Chunk.Size);
+                _terrainTiles[i] = GameArt.TerrainTile(chunk.Terrain[i], at);
+                _oreTiles[i] = GameArt.OreTile(chunk.Ore[i], at);
             }
             terrainMap.SetTiles(_positions, _terrainTiles);
             oreMap.SetTiles(_positions, _oreTiles);
+            ShowBlends(chunk);
+        }
+
+        static TileBase[][] CreateBlendBuffers()
+        {
+            var buffers = new TileBase[TerrainBlend.Order.Length][];
+            for (int i = 0; i < buffers.Length; i++) buffers[i] = new TileBase[Chunk.Area];
+            return buffers;
+        }
+
+        /// <summary>For each tile, overlays every higher-priority terrain that touches it.</summary>
+        void ShowBlends(Chunk chunk)
+        {
+            if (blendMaps == null || blendMaps.Length < TerrainBlend.Order.Length) return;
+            Int2 origin = chunk.Origin;
+            for (int layer = 1; layer < TerrainBlend.Order.Length; layer++)
+                System.Array.Clear(_blendTiles[layer], 0, Chunk.Area);
+
+            for (int i = 0; i < Chunk.Area; i++)
+            {
+                var at = new Int2(origin.X + i % Chunk.Size, origin.Y + i / Chunk.Size);
+                int own = TerrainBlend.Priority(chunk.Terrain[i]);
+                for (int layer = own + 1; layer < TerrainBlend.Order.Length; layer++)
+                {
+                    var over = TerrainBlend.Order[layer];
+                    _blendTiles[layer][i] = TerrainBlend.Tile(over, TerrainBlend.Mask(_world, at, over));
+                }
+            }
+            for (int layer = 1; layer < TerrainBlend.Order.Length; layer++)
+                blendMaps[layer].SetTiles(_positions, _blendTiles[layer]);
         }
 
         void Hide(Int2 coord)
@@ -92,6 +130,9 @@ namespace Cogworks.View
             System.Array.Clear(_terrainTiles, 0, Chunk.Area);
             terrainMap.SetTiles(_positions, _terrainTiles);
             oreMap.SetTiles(_positions, _terrainTiles);
+            if (blendMaps != null)
+                foreach (var map in blendMaps)
+                    if (map != null) map.SetTiles(_positions, _terrainTiles);
         }
 
         void FillPositions(Int2 coord)

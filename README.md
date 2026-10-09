@@ -73,7 +73,15 @@ capacity.
 
 Performance: about 0.8 ms of sim time per tick with 10,000 items on 2,500 belts; world hash about 0.7 ms.
 
+## Art
+
+All sprites are original 16 px pixel art in a warm industrial palette (brass, copper, wood, iron), generated
+by `Tools/art/generate.py` into `Assets/_Game/Art/Resources/Art` (`python3 Tools/art/generate.py`, needs
+Pillow and numpy). The PNGs can be hand-edited too; re-running the script overwrites them. Terrain has
+per-tile variants and soft borders built at runtime; machines animate while working, at a speed tied to
+their network's RPM.
+
 ## Not yet built
 
-Fluids/pipes, trains, real art and music, and a dedicated-server mode. The architecture leaves room for all
+Fluids/pipes, trains, music, and a dedicated-server mode. The architecture leaves room for all
 of them: new mechanics are new building logic plus commands, and the sim already runs headless.

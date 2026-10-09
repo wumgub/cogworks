@@ -25,7 +25,7 @@ namespace Cogworks.View
 
         void Awake()
         {
-            GetComponent<SpriteRenderer>().sprite = PlaceholderArt.PlayerSprite();
+            GetComponent<SpriteRenderer>().sprite = GameArt.PlayerSprite();
             if (bootstrap == null) bootstrap = GameBootstrap.Instance;
         }
 

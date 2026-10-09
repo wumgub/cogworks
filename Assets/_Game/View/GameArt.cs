@@ -6,15 +6,17 @@ using UnityEngine.Tilemaps;
 namespace Cogworks.View
 {
     /// <summary>
-    /// Generates 16x16 pixel-art placeholder sprites at runtime so the game is playable before real art exists.
-    /// Swap these for imported sprites later; nothing else depends on how they are made.
+    /// All game sprites. Uses the authored art in <see cref="ArtLibrary"/> (Resources/Art) and falls back
+    /// to sprites generated here at runtime for anything the library lacks.
     /// </summary>
-    public static partial class PlaceholderArt
+    public static partial class GameArt
     {
         public const int PixelsPerUnit = 16;
 
         static readonly Dictionary<TerrainType, Tile> TerrainTiles = new Dictionary<TerrainType, Tile>();
         static readonly Dictionary<Ore, Tile> OreTiles = new Dictionary<Ore, Tile>();
+        static readonly Dictionary<(string, int), TileBase> VariantTiles = new Dictionary<(string, int), TileBase>();
+        static readonly Dictionary<ushort, Sprite[]> BuildingFrameCache = new Dictionary<ushort, Sprite[]>();
         static readonly Dictionary<ushort, Sprite> BuildingSprites = new Dictionary<ushort, Sprite>();
         static readonly Sprite[] PlayerSprites = new Sprite[4];
 
@@ -26,6 +28,47 @@ namespace Cogworks.View
             new Color32(120, 200, 90, 255),
             new Color32(200, 110, 210, 255),
         };
+
+        /// <summary>Terrain tile for a world position; authored art picks a stable variant per tile, water animates.</summary>
+        public static TileBase TerrainTile(TerrainType terrain, Int2 at)
+        {
+            string name = "terrain_" + terrain.ToString().ToLowerInvariant();
+            var frames = ArtLibrary.Frames(name);
+            if (frames == null) return TerrainTile(terrain);
+            if (terrain == TerrainType.Water) return AnimatedTileFor(name, frames, ArtLibrary.Fps(name));
+            return VariantTile(name, frames, at);
+        }
+
+        /// <summary>Ore overlay for a world position, or null for no ore.</summary>
+        public static TileBase OreTile(Ore ore, Int2 at)
+        {
+            if (ore == Ore.None) return null;
+            string name = "ore_" + ore.ToString().ToLowerInvariant();
+            var frames = ArtLibrary.Frames(name);
+            return frames == null ? OreTile(ore) : VariantTile(name, frames, at);
+        }
+
+        static TileBase VariantTile(string name, Sprite[] frames, Int2 at)
+        {
+            int v = (int)(Noise.Hash(at.X, at.Y, 0x7A11u) % (uint)frames.Length);
+            if (!VariantTiles.TryGetValue((name, v), out var tile))
+            {
+                tile = MakeTile(frames[v]);
+                VariantTiles[(name, v)] = tile;
+            }
+            return tile;
+        }
+
+        static TileBase AnimatedTileFor(string name, Sprite[] frames, int fps)
+        {
+            if (VariantTiles.TryGetValue((name, -1), out var cached)) return cached;
+            var tile = ScriptableObject.CreateInstance<AnimatedTile>();
+            tile.m_AnimatedSprites = frames;
+            tile.m_MinSpeed = tile.m_MaxSpeed = Mathf.Max(1, fps);
+            tile.m_TileColliderType = Tile.ColliderType.None;
+            VariantTiles[(name, -1)] = tile;
+            return tile;
+        }
 
         public static Tile TerrainTile(TerrainType terrain)
         {
@@ -48,8 +91,14 @@ namespace Cogworks.View
             return tile;
         }
 
+        /// <summary>Walk frames for a player slot facing "down", "up", "left" or "right" (null without authored art).</summary>
+        public static Sprite[] PlayerFrames(int slot, string facing) =>
+            ArtLibrary.Frames($"player_{Mathf.Abs(slot) % 4}_{facing}");
+
         public static Sprite PlayerSprite(int slot = 0)
         {
+            var authored = PlayerFrames(slot, "down");
+            if (authored != null) return authored[0];
             slot = Mathf.Abs(slot) % PlayerSprites.Length;
             if (PlayerSprites[slot] != null) return PlayerSprites[slot];
 
@@ -72,7 +121,26 @@ namespace Cogworks.View
         /// Sprite covering the building's unrotated (North-facing) footprint. Rotatable buildings get an
         /// arrow pointing up, so rotating the transform shows their facing.
         /// </summary>
-        public static Sprite BuildingSprite(BuildingSpec spec)
+        /// <summary>Animation frames for a building (a single frame if it doesn't animate).</summary>
+        public static Sprite[] BuildingFrames(BuildingSpec spec)
+        {
+            if (BuildingFrameCache.TryGetValue(spec.Id, out var frames)) return frames;
+            frames = ArtLibrary.Frames("building_" + spec.Key) ?? new[] { GeneratedBuildingSprite(spec) };
+            BuildingFrameCache[spec.Id] = frames;
+            return frames;
+        }
+
+        public static int BuildingFps(BuildingSpec spec) => ArtLibrary.Fps("building_" + spec.Key);
+
+        /// <summary>The swinging arm drawn over inserters (null without authored art).</summary>
+        public static Sprite InserterArm() => ArtLibrary.First("building_inserter_arm");
+
+        /// <summary>"nopower" or "overstress" badge (null without authored art).</summary>
+        public static Sprite StatusBadge(string kind) => ArtLibrary.First("building_status_" + kind);
+
+        public static Sprite BuildingSprite(BuildingSpec spec) => BuildingFrames(spec)[0];
+
+        static Sprite GeneratedBuildingSprite(BuildingSpec spec)
         {
             if (BuildingSprites.TryGetValue(spec.Id, out var cached)) return cached;
 

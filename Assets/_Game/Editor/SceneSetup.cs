@@ -41,7 +41,7 @@ namespace Cogworks.Editor
             cameraGo.AddComponent<UniversalAdditionalCameraData>().renderPostProcessing = false;
             cameraGo.AddComponent<AudioListener>();
             var pixelPerfect = cameraGo.AddComponent<PixelPerfectCamera>();
-            pixelPerfect.assetsPPU = PlaceholderArt.PixelsPerUnit;
+            pixelPerfect.assetsPPU = GameArt.PixelsPerUnit;
             pixelPerfect.refResolutionX = 640;
             pixelPerfect.refResolutionY = 360;
             var rig = cameraGo.AddComponent<CameraRig>();
@@ -52,7 +52,11 @@ namespace Cogworks.Editor
             var gridGo = new GameObject("Grid");
             gridGo.AddComponent<Grid>();
             var terrainMap = CreateTilemap(gridGo.transform, "Terrain", 0);
-            var oreMap = CreateTilemap(gridGo.transform, "Ore", 1);
+            // Soft borders: one layer per terrain that can overlay others (TerrainBlend.Order[1..]).
+            var blendMaps = new Tilemap[TerrainBlend.Order.Length];
+            for (int i = 1; i < blendMaps.Length; i++)
+                blendMaps[i] = CreateTilemap(gridGo.transform, "Blend_" + TerrainBlend.Order[i], i);
+            var oreMap = CreateTilemap(gridGo.transform, "Ore", TerrainBlend.Order.Length);
 
             var gameGo = new GameObject("Game");
             var bootstrap = gameGo.AddComponent<GameBootstrap>();
@@ -104,7 +108,8 @@ namespace Cogworks.Editor
             var launcher = netGo.AddComponent<CommandLineLauncher>();
 
             Wire(worldView, ("bootstrap", bootstrap), ("terrainMap", terrainMap), ("oreMap", oreMap), ("focus", cameraGo.transform));
-            Wire(buildingsView, ("bootstrap", bootstrap));
+            WireArray(worldView, "blendMaps", blendMaps);
+            Wire(buildingsView, ("bootstrap", bootstrap), ("worldCamera", camera));
             Wire(build, ("bootstrap", bootstrap), ("worldCamera", camera), ("hotbar", hotbar));
             Wire(hotbar, ("build", build));
             Wire(beltItems, ("bootstrap", bootstrap), ("worldCamera", camera));
@@ -143,8 +148,9 @@ namespace Cogworks.Editor
         {
             Directory.CreateDirectory(PrefabDir);
             var go = new GameObject("PlayerAvatar");
-            go.AddComponent<SpriteRenderer>().sortingOrder = 10;
+            go.AddComponent<SpriteRenderer>().sortingOrder = 15;
             go.AddComponent<PlayerController>();
+            go.AddComponent<PlayerSpriteAnimator>();
             go.AddComponent<NetworkObject>();
             var nt = go.AddComponent<NetworkTransform>();
             // The owner moves its own avatar; only 2D position needs to replicate.
@@ -186,6 +192,15 @@ namespace Cogworks.Editor
             var tilemap = go.AddComponent<Tilemap>();
             go.AddComponent<TilemapRenderer>().sortingOrder = sortingOrder;
             return tilemap;
+        }
+
+        static void WireArray(Object target, string field, Object[] values)
+        {
+            var so = new SerializedObject(target);
+            var prop = so.FindProperty(field) ?? throw new System.ArgumentException($"{target.GetType().Name} has no field '{field}'");
+            prop.arraySize = values.Length;
+            for (int i = 0; i < values.Length; i++) prop.GetArrayElementAtIndex(i).objectReferenceValue = values[i];
+            so.ApplyModifiedPropertiesWithoutUndo();
         }
 
         static void Wire(Object target, params (string field, Object value)[] refs)

@@ -17,7 +17,7 @@
     padding: 6px 14px;
     font-size: 14px;
     color: rgb(255, 240, 200);
-    background-color: rgba(20, 22, 28, 0.85);
+    background-color: rgba(26, 20, 18, 0.85);
     border-radius: 4px;
     border-width: 1px;
     border-color: rgb(240, 180, 60);
@@ -27,8 +27,8 @@
     margin-bottom: 4px;
     padding: 3px 8px;
     font-size: 12px;
-    color: rgb(225, 228, 235);
-    background-color: rgba(20, 22, 28, 0.75);
+    color: rgb(236, 226, 210);
+    background-color: rgba(26, 20, 18, 0.75);
     border-radius: 3px;
 }
 
@@ -38,15 +38,15 @@
     color: rgb(245, 240, 225);
     margin-bottom: 4px;
     -unity-text-outline-width: 1px;
-    -unity-text-outline-color: rgb(20, 22, 28);
+    -unity-text-outline-color: rgb(26, 20, 18);
 }
 
 .hotbar {
     flex-direction: row;
     padding: 4px;
-    background-color: rgba(20, 22, 28, 0.88);
+    background-color: rgba(26, 20, 18, 0.88);
     border-width: 2px;
-    border-color: rgb(58, 62, 72);
+    border-color: rgb(96, 72, 40);
     border-radius: 4px;
 }
 
@@ -56,14 +56,14 @@
     margin: 2px;
     align-items: center;
     justify-content: center;
-    background-color: rgb(38, 42, 50);
+    background-color: rgb(48, 38, 32);
     border-width: 2px;
-    border-color: rgb(66, 70, 80);
+    border-color: rgb(96, 72, 40);
     border-radius: 2px;
 }
 
 .slot:hover {
-    border-color: rgb(140, 144, 154);
+    border-color: rgb(176, 150, 110);
 }
 
 .slot--selected {
@@ -86,15 +86,15 @@
     left: 3px;
     top: 0;
     font-size: 11px;
-    color: rgb(190, 190, 196);
+    color: rgb(204, 194, 180);
 }
 
 .hint {
     margin-top: 5px;
     font-size: 11px;
-    color: rgba(235, 235, 240, 0.65);
+    color: rgba(240, 232, 220, 0.65);
     -unity-text-outline-width: 1px;
-    -unity-text-outline-color: rgba(20, 22, 28, 0.8);
+    -unity-text-outline-color: rgba(26, 20, 18, 0.8);
 }
 
 .slot-count {

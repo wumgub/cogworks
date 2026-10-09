@@ -1,0 +1,226 @@
+{
+ "building_assembler": {
+  "fps": 8,
+  "frames": 4
+ },
+ "building_chest": {
+  "fps": 0,
+  "frames": 1
+ },
+ "building_conveyor": {
+  "fps": 8,
+  "frames": 4
+ },
+ "building_drill": {
+  "fps": 12,
+  "frames": 4
+ },
+ "building_fast_conveyor": {
+  "fps": 16,
+  "frames": 4
+ },
+ "building_furnace": {
+  "fps": 8,
+  "frames": 4
+ },
+ "building_gearbox": {
+  "fps": 12,
+  "frames": 4
+ },
+ "building_hand_crank": {
+  "fps": 8,
+  "frames": 4
+ },
+ "building_inserter": {
+  "fps": 0,
+  "frames": 1
+ },
+ "building_inserter_arm": {
+  "fps": 0,
+  "frames": 1
+ },
+ "building_lab": {
+  "fps": 6,
+  "frames": 4
+ },
+ "building_shaft": {
+  "fps": 12,
+  "frames": 4
+ },
+ "building_splitter": {
+  "fps": 0,
+  "frames": 1
+ },
+ "building_status_nopower": {
+  "fps": 0,
+  "frames": 1
+ },
+ "building_status_overstress": {
+  "fps": 0,
+  "frames": 1
+ },
+ "building_steam_engine": {
+  "fps": 10,
+  "frames": 4
+ },
+ "building_underground_in": {
+  "fps": 0,
+  "frames": 1
+ },
+ "building_underground_out": {
+  "fps": 0,
+  "frames": 1
+ },
+ "building_water_wheel": {
+  "fps": 8,
+  "frames": 4
+ },
+ "item_circuit": {
+  "fps": 0,
+  "frames": 1
+ },
+ "item_coal": {
+  "fps": 0,
+  "frames": 1
+ },
+ "item_copper_ore": {
+  "fps": 0,
+  "frames": 1
+ },
+ "item_copper_plate": {
+  "fps": 0,
+  "frames": 1
+ },
+ "item_copper_wire": {
+  "fps": 0,
+  "frames": 1
+ },
+ "item_iron_gear": {
+  "fps": 0,
+  "frames": 1
+ },
+ "item_iron_ore": {
+  "fps": 0,
+  "frames": 1
+ },
+ "item_iron_plate": {
+  "fps": 0,
+  "frames": 1
+ },
+ "item_science_green": {
+  "fps": 0,
+  "frames": 1
+ },
+ "item_science_red": {
+  "fps": 0,
+  "frames": 1
+ },
+ "item_stone": {
+  "fps": 0,
+  "frames": 1
+ },
+ "item_stone_brick": {
+  "fps": 0,
+  "frames": 1
+ },
+ "ore_coal": {
+  "fps": 0,
+  "frames": 6
+ },
+ "ore_copper": {
+  "fps": 0,
+  "frames": 6
+ },
+ "ore_iron": {
+  "fps": 0,
+  "frames": 6
+ },
+ "ore_stone": {
+  "fps": 0,
+  "frames": 6
+ },
+ "player_0_down": {
+  "fps": 8,
+  "frames": 3
+ },
+ "player_0_left": {
+  "fps": 8,
+  "frames": 3
+ },
+ "player_0_right": {
+  "fps": 8,
+  "frames": 3
+ },
+ "player_0_up": {
+  "fps": 8,
+  "frames": 3
+ },
+ "player_1_down": {
+  "fps": 8,
+  "frames": 3
+ },
+ "player_1_left": {
+  "fps": 8,
+  "frames": 3
+ },
+ "player_1_right": {
+  "fps": 8,
+  "frames": 3
+ },
+ "player_1_up": {
+  "fps": 8,
+  "frames": 3
+ },
+ "player_2_down": {
+  "fps": 8,
+  "frames": 3
+ },
+ "player_2_left": {
+  "fps": 8,
+  "frames": 3
+ },
+ "player_2_right": {
+  "fps": 8,
+  "frames": 3
+ },
+ "player_2_up": {
+  "fps": 8,
+  "frames": 3
+ },
+ "player_3_down": {
+  "fps": 8,
+  "frames": 3
+ },
+ "player_3_left": {
+  "fps": 8,
+  "frames": 3
+ },
+ "player_3_right": {
+  "fps": 8,
+  "frames": 3
+ },
+ "player_3_up": {
+  "fps": 8,
+  "frames": 3
+ },
+ "terrain_dirt": {
+  "fps": 0,
+  "frames": 4
+ },
+ "terrain_grass": {
+  "fps": 0,
+  "frames": 4
+ },
+ "terrain_rock": {
+  "fps": 0,
+  "frames": 4
+ },
+ "terrain_sand": {
+  "fps": 0,
+  "frames": 4
+ },
+ "terrain_water": {
+  "fps": 3,
+  "frames": 4
+ }
+}

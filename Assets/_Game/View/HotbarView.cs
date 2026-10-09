@@ -45,7 +45,7 @@ namespace Cogworks.View
 
                 var icon = new VisualElement { pickingMode = PickingMode.Ignore };
                 icon.AddToClassList("slot-icon");
-                icon.style.backgroundImage = new StyleBackground(PlaceholderArt.BuildingSprite(spec));
+                icon.style.backgroundImage = new StyleBackground(GameArt.BuildingSprite(spec));
                 slot.Add(icon);
 
                 var key = new Label(((i + 1) % 10).ToString()) { pickingMode = PickingMode.Ignore };

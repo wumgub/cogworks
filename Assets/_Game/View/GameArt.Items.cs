@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Cogworks.View
 {
     /// <summary>Item icons, building glyphs and small UI sprites, all generated as 16x16 pixel art.</summary>
-    public static partial class PlaceholderArt
+    public static partial class GameArt
     {
         internal static readonly Color32 IronOreColor = new Color32(165, 185, 215, 255);
         internal static readonly Color32 CopperOreColor = new Color32(216, 122, 58, 255);
@@ -24,6 +24,7 @@ namespace Cogworks.View
             var spec = ItemCatalog.Get(itemId);
             Sprite sprite;
             if (spec?.Places != null) sprite = BuildingSprite(spec.Places);
+            else if (spec != null && ArtLibrary.First("item_" + spec.Key) is Sprite authored) sprite = authored;
             else
             {
                 var px = new Color32[PixelsPerUnit * PixelsPerUnit];
