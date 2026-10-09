@@ -91,7 +91,10 @@ namespace Cogworks.Game
             fullscreen.value = GameSettings.Fullscreen;
             fullscreen.RegisterValueChangedCallback(e => GameSettings.Fullscreen = e.newValue);
 
+            // Explicitly closed: a game started from the command line can already be running here,
+            // in which case Refresh won't hide the pause menu for us.
             ShowOverlay(null);
+            SetPause(false);
             game.Changed += Refresh;
             Refresh();
         }
@@ -268,10 +271,10 @@ Drills and assemblers need rotation, like in Create. Generators make it: a Hand 
 Every machine adds stress. If a network needs more stress (SU) than its generators supply, the whole network stops and its cogs turn red. Add generators or split the network.
 
 <b>Logistics</b>
-Conveyor belts carry up to 4 items per tile and feed into belts ahead of them, including from the side. Inserters move items from the tile behind them to the tile in front (follow the arrow). Drills push ore into whatever is in front of them.
+Conveyor belts carry up to 4 items per tile and feed into belts ahead of them, including from the side. Inserters move items from the tile behind them to the tile in front (follow the arrow). Drills push ore into whatever is in front of them. Splitters deal a belt's items out to the front, left and right. An underground belt entrance tunnels to the first exit facing the same way up to 5 tiles ahead.
 
 <b>Research</b>
-Craft Automation Science packs, build a Research Lab, put packs in it, and press T to choose a project. Research unlocks assemblers, water wheels, steam engines and fast belts.
+Craft Automation Science packs, build a Research Lab, put packs in it, and press T to choose a project. Research unlocks assemblers, splitters, underground belts, steam engines, green science and fast belts.
 
 <b>Saving</b>
 F5 saves, and the game autosaves every 5 minutes. The host's save holds the whole multiplayer world; tick 'Host my saved world' to continue it with friends.

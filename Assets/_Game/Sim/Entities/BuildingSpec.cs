@@ -13,6 +13,9 @@ namespace Cogworks.Sim
         Gearbox,
         Generator,
         Lab,
+        Splitter,
+        UndergroundEntrance,
+        UndergroundExit,
     }
 
     /// <summary>How a building takes part in rotational-power networks.</summary>

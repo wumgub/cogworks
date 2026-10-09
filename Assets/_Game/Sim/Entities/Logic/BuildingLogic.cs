@@ -23,6 +23,12 @@ namespace Cogworks.Sim
         /// <summary>Adds one item. Only call after <see cref="CanAccept"/> returned true this tick.</summary>
         public virtual void Insert(ushort item, Int2 fromTile) { }
 
+        /// <summary>
+        /// True if a belt pointing into this building's back should hand its items straight in
+        /// (splitters, underground entrances) instead of stopping at the end.
+        /// </summary>
+        public virtual bool AcceptsBeltInput => false;
+
         /// <summary>Removes one output item that <paramref name="accept"/> allows (null = anything).</summary>
         public virtual bool TryTake(Func<ushort, bool> accept, out ushort item)
         {
@@ -71,6 +77,9 @@ namespace Cogworks.Sim
             BuildingKind.Assembler => new AssemblerLogic(),
             BuildingKind.Generator => new GeneratorLogic(),
             BuildingKind.Lab => new LabLogic(),
+            BuildingKind.Splitter => new SplitterLogic(),
+            BuildingKind.UndergroundEntrance => new UndergroundEntranceLogic(),
+            BuildingKind.UndergroundExit => new UndergroundExitLogic(),
             _ => new PassiveLogic(),
         };
 

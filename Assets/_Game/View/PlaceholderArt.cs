@@ -127,6 +127,9 @@ namespace Cogworks.View
             "steam_engine" => new Color32(90, 90, 98, 255),
             "lab" => new Color32(200, 205, 215, 255),
             "fast_conveyor" => new Color32(160, 40, 40, 255),
+            "splitter" => new Color32(70, 70, 78, 255),
+            "underground_in" => new Color32(55, 55, 62, 255),
+            "underground_out" => new Color32(55, 55, 62, 255),
             _ => new Color32(200, 0, 200, 255),
         };
 

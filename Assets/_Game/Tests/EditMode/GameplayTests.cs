@@ -114,6 +114,77 @@ namespace Cogworks.Sim.Tests
             Assert.AreEqual(RunLoop(), RunLoop());
         }
 
+        [Test]
+        public void Splitter_SharesItemsRoundRobin()
+        {
+            var sim = Sandbox();
+            var w = sim.World;
+            var o = ClearArea(w, 3, 3);
+            // Splitter in the middle facing North, with belts leading away to the front, left and right.
+            var splitter = (SplitterLogic)Place(w, BuildingCatalog.Splitter, new Int2(o.X + 1, o.Y + 1), Direction.North).Logic;
+            var front = (ConveyorLogic)Place(w, BuildingCatalog.Conveyor, new Int2(o.X + 1, o.Y + 2), Direction.North).Logic;
+            var left = (ConveyorLogic)Place(w, BuildingCatalog.Conveyor, new Int2(o.X, o.Y + 1), Direction.West).Logic;
+            var right = (ConveyorLogic)Place(w, BuildingCatalog.Conveyor, new Int2(o.X + 2, o.Y + 1), Direction.East).Logic;
+
+            for (int i = 0; i < 6; i++)
+            {
+                if (splitter.CanAccept(IronOre, o)) splitter.Insert(IronOre, o);
+                Run(sim, 40);
+            }
+            Assert.AreEqual(2, front.Items.Count);
+            Assert.AreEqual(2, left.Items.Count);
+            Assert.AreEqual(2, right.Items.Count);
+        }
+
+        [Test]
+        public void Belt_FeedsIntoSplitter()
+        {
+            var sim = Sandbox();
+            var w = sim.World;
+            var o = ClearArea(w, 3, 1);
+            var belt = (ConveyorLogic)Place(w, BuildingCatalog.Conveyor, o, Direction.East).Logic;
+            Place(w, BuildingCatalog.Splitter, new Int2(o.X + 1, o.Y), Direction.East);
+            var after = (ConveyorLogic)Place(w, BuildingCatalog.Conveyor, new Int2(o.X + 2, o.Y), Direction.East).Logic;
+            belt.TryInsertAtEntry(IronOre);
+            Run(sim, 120);
+            Assert.AreEqual(0, belt.Items.Count);
+            Assert.AreEqual(1, after.Items.Count, "item should pass through the splitter onto the belt ahead");
+        }
+
+        [Test]
+        public void Underground_CarriesItemsUnderObstacles()
+        {
+            var sim = Sandbox();
+            var w = sim.World;
+            var o = ClearArea(w, 7, 1);
+            var feed = (ConveyorLogic)Place(w, BuildingCatalog.Conveyor, o, Direction.East).Logic;
+            Place(w, BuildingCatalog.UndergroundEntrance, new Int2(o.X + 1, o.Y), Direction.East);
+            Place(w, BuildingCatalog.Chest, new Int2(o.X + 2, o.Y));   // obstacles in between
+            Place(w, BuildingCatalog.Chest, new Int2(o.X + 3, o.Y));
+            Place(w, BuildingCatalog.UndergroundExit, new Int2(o.X + 4, o.Y), Direction.East);
+            var outBelt = (ConveyorLogic)Place(w, BuildingCatalog.Conveyor, new Int2(o.X + 5, o.Y), Direction.East).Logic;
+            var sink = (ChestLogic)Place(w, BuildingCatalog.Chest, new Int2(o.X + 6, o.Y)).Logic;
+
+            for (int i = 0; i < 3; i++) feed.TryInsertAt(i * ConveyorLogic.Spacing, IronOre);
+            Run(sim, 400);
+            Assert.AreEqual(0, feed.Items.Count, "entrance should take everything");
+            Assert.AreEqual(3, outBelt.Items.Count, "all three should come out of the exit");
+            Assert.AreEqual(0, sink.Inventory.Count(IronOre), "belts don't insert into chests by themselves");
+        }
+
+        [Test]
+        public void Underground_WithoutExit_RefusesItems()
+        {
+            var sim = Sandbox();
+            var w = sim.World;
+            var o = ClearArea(w, 2, 1);
+            var feed = (ConveyorLogic)Place(w, BuildingCatalog.Conveyor, o, Direction.East).Logic;
+            Place(w, BuildingCatalog.UndergroundEntrance, new Int2(o.X + 1, o.Y), Direction.East);
+            feed.TryInsertAtEntry(IronOre);
+            Run(sim, 100);
+            Assert.AreEqual(1, feed.Items.Count);
+        }
+
         // ------------------------------------------------------------------ inserters and chests
 
         [Test]
@@ -421,7 +492,7 @@ namespace Cogworks.Sim.Tests
             var sim = Sandbox();
             sim.Schedule(0, new SetResearchCommand(TechCatalog.SteamPower.Id));
             sim.Step();
-            Assert.IsNull(sim.World.Research.Current, "steam power needs hydropower first");
+            Assert.IsNull(sim.World.Research.Current, "steam power needs automation first");
         }
 
         // ------------------------------------------------------------------ persistence

@@ -156,10 +156,14 @@ namespace Cogworks.Sim.Tests
         }
 
         [Test]
-        public void Conveyors_AreWalkable_OtherBuildingsAreSolid()
+        public void BeltFamily_IsWalkable_OtherBuildingsAreSolid()
         {
             foreach (var spec in BuildingCatalog.All)
-                Assert.AreEqual(spec.Kind != BuildingKind.Conveyor, spec.Solid, spec.Key);
+            {
+                bool belt = spec.Kind == BuildingKind.Conveyor || spec.Kind == BuildingKind.Splitter
+                    || spec.Kind == BuildingKind.UndergroundEntrance || spec.Kind == BuildingKind.UndergroundExit;
+                Assert.AreEqual(!belt, spec.Solid, spec.Key);
+            }
         }
     }
 

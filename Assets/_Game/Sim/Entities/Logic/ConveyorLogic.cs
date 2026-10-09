@@ -28,6 +28,8 @@ namespace Cogworks.Sim
         internal ConveyorLogic Next;
         /// <summary>True if <see cref="Next"/> runs perpendicular (we side-load into it).</summary>
         internal bool NextIsSide;
+        /// <summary>Non-belt building ahead that takes items straight off the end (splitter, underground).</summary>
+        internal BuildingLogic NextSink;
 
         public int Speed => Building.Spec.BeltSpeed;
 
@@ -46,12 +48,19 @@ namespace Cogworks.Sim
                     int tail = Next.TailPos;
                     limit = tail == int.MaxValue ? int.MaxValue : Length + tail - Spacing;
                 }
-                else limit = Next != null ? Length : Length - 1;
+                else limit = Next != null || NextSink != null ? Length : Length - 1;
 
                 int pos = Math.Max(it.Pos, Math.Min(it.Pos + Speed, limit));
-                if (i == 0 && pos >= Length && Next != null)
+                if (i == 0 && pos >= Length && (Next != null || NextSink != null))
                 {
-                    bool moved = NextIsSide ? Next.TryInsertAt(MidPos, it.Item) : Next.TryAppendTail(pos - Length, it.Item);
+                    bool moved;
+                    if (Next != null) moved = NextIsSide ? Next.TryInsertAt(MidPos, it.Item) : Next.TryAppendTail(pos - Length, it.Item);
+                    else if (NextSink.CanAccept(it.Item, Building.Origin))
+                    {
+                        NextSink.Insert(it.Item, Building.Origin);
+                        moved = true;
+                    }
+                    else moved = false;
                     if (moved)
                     {
                         Items.RemoveAt(0);
@@ -64,6 +73,9 @@ namespace Cogworks.Sim
                 Items[i] = it;
             }
         }
+
+        /// <summary>Puts an item at the entry edge, as if it arrived from the belt behind.</summary>
+        public bool TryInsertAtEntry(ushort item) => TryAppendTail(0, item);
 
         bool TryAppendTail(int pos, ushort item)
         {

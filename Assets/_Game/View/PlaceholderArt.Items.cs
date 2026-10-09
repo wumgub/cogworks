@@ -122,6 +122,21 @@ namespace Cogworks.View
                 case "lab":
                     DrawFlaskAt(px, w, cx - 8, cy - 8, new Color32(90, 160, 230, 255));
                     break;
+                case "splitter":
+                    // Three yellow pips: front, left, right outputs.
+                    var pip = new Color32(240, 200, 60, 255);
+                    Fill(px, w, cx - 1, h - 4, 2, 2, pip, stride: w);
+                    Fill(px, w, 2, cy - 1, 2, 2, pip, stride: w);
+                    Fill(px, w, w - 4, cy - 1, 2, 2, pip, stride: w);
+                    break;
+                case "underground_in":
+                    // Dark tunnel mouth at the far (front) end.
+                    Fill(px, w, 2, h - 6, w - 4, 4, new Color32(15, 15, 18, 255), stride: w);
+                    break;
+                case "underground_out":
+                    // Tunnel mouth at the back end.
+                    Fill(px, w, 2, 2, w - 4, 4, new Color32(15, 15, 18, 255), stride: w);
+                    break;
             }
         }
 

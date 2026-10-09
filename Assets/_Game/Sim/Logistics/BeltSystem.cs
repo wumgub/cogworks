@@ -32,8 +32,11 @@ namespace Cogworks.Sim
             {
                 c.Next = null;
                 c.NextIsSide = false;
+                c.NextSink = null;
                 var dir = c.Building.Direction;
                 var ahead = world.Buildings.GetAt(c.Building.Origin + dir.ToOffset());
+                // Splitters and underground entrances take belt input from behind, facing the same way.
+                if (ahead != null && ahead.Logic.AcceptsBeltInput && ahead.Direction == dir) c.NextSink = ahead.Logic;
                 if (ahead?.Logic is ConveyorLogic n && n.Building.Direction != dir.Opposite())
                 {
                     c.Next = n;

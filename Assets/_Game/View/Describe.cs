@@ -41,6 +41,14 @@ namespace Cogworks.View
                     return i.Held != ItemCatalog.None ? $"Holding {ItemCatalog.NameOf(i.Held)}" : "Idle";
                 case ConveyorLogic c:
                     return $"{c.Items.Count} item{(c.Items.Count == 1 ? "" : "s")}";
+                case SplitterLogic _:
+                    return "Shares items between front, left and right";
+                case UndergroundEntranceLogic u:
+                    var exit = u.FindExit(world);
+                    return exit == null ? $"No exit facing the same way within {UndergroundEntranceLogic.MaxGap} tiles"
+                        : $"Linked  ·  {u.InTransit} item{(u.InTransit == 1 ? "" : "s")} underground";
+                case UndergroundExitLogic _:
+                    return "Items come out here";
                 case ChestLogic ch:
                     return ch.Inventory.IsEmpty ? "Empty" : "Storing items";
                 default:

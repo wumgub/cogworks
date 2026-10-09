@@ -27,12 +27,17 @@ namespace Cogworks.Sim
         public static readonly BuildingSpec Lab = new BuildingSpec(12, "lab", "Research Lab", BuildingKind.Lab, 2, 2, rotatable: false);
         public static readonly BuildingSpec FastConveyor = new BuildingSpec(13, "fast_conveyor", "Fast Conveyor Belt", BuildingKind.Conveyor, 1, 1,
             orientOnDrag: true, solid: false).WithBeltSpeed(16);
+        public static readonly BuildingSpec Splitter = new BuildingSpec(14, "splitter", "Splitter", BuildingKind.Splitter, 1, 1, solid: false);
+        public static readonly BuildingSpec UndergroundEntrance = new BuildingSpec(15, "underground_in", "Underground Belt (in)",
+            BuildingKind.UndergroundEntrance, 1, 1, solid: false);
+        public static readonly BuildingSpec UndergroundExit = new BuildingSpec(16, "underground_out", "Underground Belt (out)",
+            BuildingKind.UndergroundExit, 1, 1, solid: false);
 
         /// <summary>Default hotbar order.</summary>
         public static readonly IReadOnlyList<BuildingSpec> All = new[]
         {
             Conveyor, Inserter, Chest, Drill, Furnace, Assembler, Shaft, Gearbox, HandCrank,
-            WaterWheel, SteamEngine, Lab, FastConveyor,
+            WaterWheel, SteamEngine, Lab, FastConveyor, Splitter, UndergroundEntrance, UndergroundExit,
         };
 
         static readonly Dictionary<ushort, BuildingSpec> ById = BuildIndex();

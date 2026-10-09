@@ -87,7 +87,8 @@ namespace Cogworks.Sim
 
         internal void OnBuildingsChanged(Building b)
         {
-            if (b.Spec.Kind == BuildingKind.Conveyor) _belts.MarkDirty();
+            // Belts link to the building ahead, so anything a belt can feed changes the links.
+            if (b.Spec.Kind == BuildingKind.Conveyor || b.Logic.AcceptsBeltInput) _belts.MarkDirty();
             if (b.Spec.Kinetic != KineticRole.None) _kinetics.MarkDirty();
         }
 
@@ -112,7 +113,16 @@ namespace Cogworks.Sim
                 }
             }
             foreach (var b in ordered)
-                if (b.Spec.Kind == BuildingKind.Inserter) b.Logic.Tick(this);
+            {
+                switch (b.Spec.Kind)
+                {
+                    case BuildingKind.Inserter:
+                    case BuildingKind.Splitter:
+                    case BuildingKind.UndergroundEntrance:
+                        b.Logic.Tick(this);
+                        break;
+                }
+            }
             _belts.Tick(this, ordered);
             Players.Tick();
         }

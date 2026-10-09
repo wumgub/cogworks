@@ -34,20 +34,21 @@ namespace Cogworks.Sim
         public static readonly Tech Automation = new Tech(1, "automation", "Automation",
             "Mechanical assemblers craft for you when given rotational power.",
             Red(10), None, RecipeCatalog.Assembler);
-        public static readonly Tech Hydropower = new Tech(2, "hydropower", "Hydropower",
-            "Water wheels turn steadily next to water. Strong, and no fuel needed.",
-            Red(15), None, RecipeCatalog.WaterWheel);
+        // Id 2 was "Hydropower"; water wheels are now available from the start so early power isn't all cranking.
+        public static readonly Tech Logistics = new Tech(6, "logistics", "Logistics",
+            "Splitters share a belt between outputs; underground belts tunnel up to 5 tiles under anything.",
+            Red(20), None, RecipeCatalog.Splitter, RecipeCatalog.UndergroundEntrance, RecipeCatalog.UndergroundExit);
         public static readonly Tech SteamPower = new Tech(3, "steam_power", "Steam Power",
-            "Coal-fired engines spin twice as fast with four times the stress capacity.",
-            Red(30), new[] { Hydropower }, RecipeCatalog.SteamEngine);
+            "Coal-fired engines spin twice as fast as water wheels, with four times the stress capacity.",
+            Red(30), new[] { Automation }, RecipeCatalog.SteamEngine);
         public static readonly Tech LogisticScience = new Tech(4, "logistic_science", "Logistic Science",
             "Unlocks green science packs for advanced research.",
             Red(30), new[] { Automation }, RecipeCatalog.GreenScience);
         public static readonly Tech Logistics2 = new Tech(5, "logistics_2", "Logistics 2",
             "Fast conveyor belts move items twice as fast.",
-            RedGreen(40, 20), new[] { LogisticScience }, RecipeCatalog.FastConveyor);
+            RedGreen(40, 20), new[] { LogisticScience, Logistics }, RecipeCatalog.FastConveyor);
 
-        public static readonly IReadOnlyList<Tech> All = new[] { Automation, Hydropower, SteamPower, LogisticScience, Logistics2 };
+        public static readonly IReadOnlyList<Tech> All = new[] { Automation, Logistics, SteamPower, LogisticScience, Logistics2 };
 
         static readonly Dictionary<ushort, Tech> ById = BuildIndex();
         static readonly HashSet<ushort> LockedRecipes = BuildLocked();

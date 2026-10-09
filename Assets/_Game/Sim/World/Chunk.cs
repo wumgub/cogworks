@@ -21,6 +21,10 @@ namespace Cogworks.Sim
         /// </summary>
         public bool Modified { get; private set; }
 
+        // Cached fingerprint of the tile data; recomputed only after the chunk changes.
+        ulong _hash;
+        bool _hashDirty = true;
+
         public Chunk(Int2 coord)
         {
             Coord = coord;
@@ -30,7 +34,12 @@ namespace Cogworks.Sim
 
         public Int2 Origin => new Int2(Coord.X * Size, Coord.Y * Size);
 
-        public void MarkModified() => Modified = true;
+        /// <summary>Call on every change to tile data (it also invalidates the cached hash).</summary>
+        public void MarkModified()
+        {
+            Modified = true;
+            _hashDirty = true;
+        }
 
         internal void Write(BinaryWriter w)
         {
@@ -54,14 +63,21 @@ namespace Cogworks.Sim
 
         internal void AddToHash(ref Fnv64 h)
         {
-            h.Add(Coord.Pack());
-            for (int i = 0; i < Area; i++)
+            if (_hashDirty)
             {
-                h.Add((byte)Terrain[i]);
-                h.Add((byte)Ore[i]);
-                h.Add(OreAmount[i]);
-                h.Add(Occupant[i]);
+                var c = Fnv64.Create();
+                c.Add(Coord.Pack());
+                for (int i = 0; i < Area; i++)
+                {
+                    c.Add((byte)Terrain[i]);
+                    c.Add((byte)Ore[i]);
+                    c.Add(OreAmount[i]);
+                    c.Add(Occupant[i]);
+                }
+                _hash = c.Value;
+                _hashDirty = false;
             }
+            h.Add((long)_hash);
         }
     }
 }

@@ -96,12 +96,19 @@ namespace Cogworks.Sim
         public static readonly Recipe FastConveyor = new Recipe(32, "fast_conveyor", CraftStation.Assembler, Second / 2,
             B(BuildingCatalog.FastConveyor), B(BuildingCatalog.Conveyor), S(ItemCatalog.IronGear, 5));
 
+        public static readonly Recipe Splitter = new Recipe(33, "splitter", CraftStation.Assembler, Second,
+            B(BuildingCatalog.Splitter), S(ItemCatalog.Circuit, 5), S(ItemCatalog.IronPlate, 5), B(BuildingCatalog.Conveyor, 4));
+        public static readonly Recipe UndergroundEntrance = new Recipe(34, "underground_in", CraftStation.Assembler, Second,
+            B(BuildingCatalog.UndergroundEntrance), S(ItemCatalog.IronPlate, 10), B(BuildingCatalog.Conveyor, 5));
+        public static readonly Recipe UndergroundExit = new Recipe(35, "underground_out", CraftStation.Assembler, Second,
+            B(BuildingCatalog.UndergroundExit), S(ItemCatalog.IronPlate, 10), B(BuildingCatalog.Conveyor, 5));
+
         public static readonly IReadOnlyList<Recipe> All = new[]
         {
             IronPlate, CopperPlate, StoneBrick,
             IronGear, CopperWire, Circuit, RedScience, GreenScience,
             Conveyor, Inserter, Chest, Drill, Furnace, Assembler, Shaft, Gearbox, HandCrank,
-            WaterWheel, SteamEngine, Lab, FastConveyor,
+            WaterWheel, SteamEngine, Lab, FastConveyor, Splitter, UndergroundEntrance, UndergroundExit,
         };
 
         static readonly Dictionary<ushort, Recipe> ById = BuildIndex();
