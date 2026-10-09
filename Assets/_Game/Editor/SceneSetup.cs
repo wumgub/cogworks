@@ -1,4 +1,9 @@
+using System.IO;
+using Cogworks.Game;
 using Cogworks.View;
+using Unity.Netcode;
+using Unity.Netcode.Components;
+using Unity.Netcode.Transports.UTP;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -8,15 +13,22 @@ using UnityEngine.UIElements;
 
 namespace Cogworks.Editor
 {
-    /// <summary>Builds the main scene from code so its wiring is reproducible and reviewable.</summary>
+    /// <summary>Builds the main scene (and the assets it needs) from code so its wiring is reproducible and reviewable.</summary>
     public static class SceneSetup
     {
         const string ScenePath = "Assets/_Game/Scenes/Main.unity";
         const string UiDir = "Assets/_Game/UI";
+        const string PrefabDir = "Assets/_Game/Prefabs";
+        const string AvatarPrefabPath = PrefabDir + "/PlayerAvatar.prefab";
+        const string NetworkPrefabsListPath = "Assets/DefaultNetworkPrefabs.asset";
 
         [MenuItem("Cogworks/Build Main Scene")]
         public static void BuildMainScene()
         {
+            // Clients must keep simulating while their window is in the background.
+            PlayerSettings.runInBackground = true;
+            var avatarPrefab = BuildAvatarPrefab();
+
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
             var cameraGo = new GameObject("Main Camera") { tag = "MainCamera" };
@@ -47,27 +59,74 @@ namespace Cogworks.Editor
             var buildingsView = gameGo.AddComponent<BuildingsView>();
             var build = gameGo.AddComponent<BuildController>();
 
+            var panelSettings = GetOrCreatePanelSettings();
             var hudGo = new GameObject("HUD");
             var hudDoc = hudGo.AddComponent<UIDocument>();
-            hudDoc.panelSettings = GetOrCreatePanelSettings();
+            hudDoc.panelSettings = panelSettings;
             hudDoc.visualTreeAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(UiDir + "/Hud.uxml");
             var hotbar = hudGo.AddComponent<HotbarView>();
 
-            var playerGo = new GameObject("Player");
-            playerGo.transform.position = new Vector3(0.5f, 0.5f, 0f);
-            playerGo.AddComponent<SpriteRenderer>().sortingOrder = 10;
-            var player = playerGo.AddComponent<PlayerController>();
+            var menuGo = new GameObject("Menu");
+            var menuDoc = menuGo.AddComponent<UIDocument>();
+            menuDoc.panelSettings = panelSettings;
+            menuDoc.visualTreeAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(UiDir + "/Menu.uxml");
+            menuDoc.sortingOrder = 10;
+            var menu = menuGo.AddComponent<MenuController>();
+
+            var netGo = new GameObject("Network");
+            var transport = netGo.AddComponent<UnityTransport>();
+            var network = netGo.AddComponent<NetworkManager>();
+            network.NetworkConfig = new NetworkConfig
+            {
+                NetworkTransport = transport,
+                PlayerPrefab = avatarPrefab.gameObject,
+                ConnectionApproval = true,
+                TickRate = 60,
+            };
+            var prefabsList = AssetDatabase.LoadAssetAtPath<NetworkPrefabsList>(NetworkPrefabsListPath);
+            if (prefabsList != null)
+            {
+                if (!prefabsList.Contains(avatarPrefab.gameObject)) prefabsList.Add(new NetworkPrefab { Prefab = avatarPrefab.gameObject });
+                EditorUtility.SetDirty(prefabsList);
+                network.NetworkConfig.Prefabs.NetworkPrefabsLists.Add(prefabsList);
+            }
+            var netGame = netGo.AddComponent<NetworkGame>();
+            var launcher = netGo.AddComponent<CommandLineLauncher>();
 
             Wire(worldView, ("bootstrap", bootstrap), ("terrainMap", terrainMap), ("oreMap", oreMap), ("focus", cameraGo.transform));
-            Wire(player, ("bootstrap", bootstrap));
             Wire(buildingsView, ("bootstrap", bootstrap));
-            Wire(build, ("bootstrap", bootstrap), ("worldCamera", camera), ("hotbar", hotbar), ("player", player));
+            Wire(build, ("bootstrap", bootstrap), ("worldCamera", camera), ("hotbar", hotbar));
             Wire(hotbar, ("build", build));
-            Wire(rig, ("target", playerGo.transform));
+            Wire(netGame, ("bootstrap", bootstrap), ("network", network), ("transport", transport),
+                ("avatarPrefab", avatarPrefab), ("cameraRig", rig), ("build", build));
+            Wire(menu, ("game", netGame), ("bootstrap", bootstrap), ("build", build));
+            Wire(launcher, ("game", netGame), ("bootstrap", bootstrap));
 
             EditorSceneManager.SaveScene(scene, ScenePath);
             EditorBuildSettings.scenes = new[] { new EditorBuildSettingsScene(ScenePath, true) };
+            AssetDatabase.SaveAssets();
             Debug.Log($"[Cogworks] Built {ScenePath}");
+        }
+
+        static PlayerAvatar BuildAvatarPrefab()
+        {
+            Directory.CreateDirectory(PrefabDir);
+            var go = new GameObject("PlayerAvatar");
+            go.AddComponent<SpriteRenderer>().sortingOrder = 10;
+            go.AddComponent<PlayerController>();
+            go.AddComponent<NetworkObject>();
+            var nt = go.AddComponent<NetworkTransform>();
+            // The owner moves its own avatar; only 2D position needs to replicate.
+            nt.AuthorityMode = NetworkTransform.AuthorityModes.Owner;
+            nt.SyncPositionZ = false;
+            nt.SyncRotAngleX = nt.SyncRotAngleY = nt.SyncRotAngleZ = false;
+            nt.SyncScaleX = nt.SyncScaleY = nt.SyncScaleZ = false;
+            nt.Interpolate = true;
+            go.AddComponent<PlayerAvatar>();
+
+            var prefab = PrefabUtility.SaveAsPrefabAsset(go, AvatarPrefabPath);
+            Object.DestroyImmediate(go);
+            return prefab.GetComponent<PlayerAvatar>();
         }
 
         static PanelSettings GetOrCreatePanelSettings()
@@ -102,7 +161,11 @@ namespace Cogworks.Editor
         {
             var so = new SerializedObject(target);
             foreach (var (field, value) in refs)
-                so.FindProperty(field).objectReferenceValue = value;
+            {
+                var prop = so.FindProperty(field);
+                if (prop == null) throw new System.ArgumentException($"{target.GetType().Name} has no serialized field '{field}'");
+                prop.objectReferenceValue = value;
+            }
             so.ApplyModifiedPropertiesWithoutUndo();
         }
     }

@@ -1,0 +1,16 @@
+{
+    "name": "Cogworks.Net",
+    "rootNamespace": "Cogworks.Net",
+    "references": [
+        "Cogworks.Sim"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": true
+}

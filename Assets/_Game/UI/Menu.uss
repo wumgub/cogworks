@@ -1,0 +1,162 @@
+.menu-root {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+}
+
+.overlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(12, 13, 17, 0.72);
+}
+
+.panel {
+    width: 380px;
+    padding: 20px 22px;
+    background-color: rgb(28, 31, 38);
+    border-width: 2px;
+    border-color: rgb(66, 70, 82);
+    border-radius: 6px;
+}
+
+.panel--small {
+    width: 280px;
+}
+
+.title {
+    font-size: 34px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    color: rgb(240, 180, 60);
+    letter-spacing: 6px;
+}
+
+.title--small {
+    font-size: 22px;
+    letter-spacing: 2px;
+}
+
+.subtitle {
+    -unity-text-align: middle-center;
+    color: rgb(150, 154, 166);
+    font-size: 12px;
+    margin-bottom: 8px;
+}
+
+.section {
+    margin-top: 12px;
+    margin-bottom: 2px;
+    font-size: 11px;
+    color: rgb(150, 154, 166);
+    -unity-font-style: bold;
+}
+
+.row {
+    flex-direction: row;
+    align-items: center;
+}
+
+.grow {
+    flex-grow: 1;
+}
+
+.btn {
+    height: 32px;
+    margin: 3px 0;
+    background-color: rgb(46, 50, 60);
+    border-width: 1px;
+    border-color: rgb(80, 85, 98);
+    border-radius: 3px;
+    color: rgb(230, 230, 236);
+    font-size: 13px;
+}
+
+.row > .field {
+    margin-right: 4px;
+}
+
+.gap-left {
+    margin-left: 4px;
+}
+
+.btn:hover {
+    background-color: rgb(60, 65, 78);
+    border-color: rgb(130, 136, 150);
+}
+
+.btn:active {
+    background-color: rgb(36, 39, 47);
+}
+
+.btn:disabled {
+    opacity: 0.45;
+}
+
+.btn--primary {
+    background-color: rgb(150, 105, 30);
+    border-color: rgb(240, 180, 60);
+    color: rgb(255, 248, 230);
+    -unity-font-style: bold;
+}
+
+.btn--primary:hover {
+    background-color: rgb(175, 125, 40);
+}
+
+.btn--quiet {
+    margin-top: 10px;
+    background-color: rgba(0, 0, 0, 0);
+    border-color: rgba(0, 0, 0, 0);
+    color: rgb(150, 154, 166);
+}
+
+.field {
+    margin: 3px 0;
+    height: 32px;
+}
+
+.field > #unity-text-input {
+    background-color: rgb(20, 22, 28);
+    border-color: rgb(80, 85, 98);
+    color: rgb(235, 235, 240);
+    font-size: 13px;
+    padding-left: 8px;
+}
+
+.status {
+    margin-top: 8px;
+    min-height: 16px;
+    white-space: normal;
+    -unity-text-align: middle-center;
+    color: rgb(240, 200, 120);
+    font-size: 12px;
+}
+
+.session-info {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    padding: 4px 8px;
+    background-color: rgba(20, 22, 28, 0.8);
+    border-radius: 3px;
+    color: rgb(230, 230, 236);
+    font-size: 12px;
+}
+
+.toggle {
+    margin: 2px 0 4px 0;
+    color: rgb(200, 202, 210);
+    font-size: 12px;
+}
+
+.toggle > Label {
+    color: rgb(200, 202, 210);
+    min-width: 0;
+}

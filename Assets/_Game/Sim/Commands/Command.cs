@@ -7,6 +7,7 @@ namespace Cogworks.Sim
         PlaceBuilding = 1,
         RemoveBuilding = 2,
         SetBuildingDirection = 3,
+        PlayerJoin = 4,
     }
 
     /// <summary>
@@ -108,5 +109,24 @@ namespace Cogworks.Sim
 
         internal static SetBuildingDirectionCommand Read(BinaryReader r) =>
             new SetBuildingDirectionCommand(new Int2(r.ReadInt32(), r.ReadInt32()), (Direction)(r.ReadByte() & 3));
+    }
+
+    /// <summary>Issued by the host (never by clients) when a player connects, so every peer adds them on the same tick.</summary>
+    public sealed class PlayerJoinCommand : Command
+    {
+        public readonly byte JoiningPlayerId;
+
+        public PlayerJoinCommand(byte joiningPlayerId)
+        {
+            JoiningPlayerId = joiningPlayerId;
+        }
+
+        public override CommandType Type => CommandType.PlayerJoin;
+
+        public override bool Apply(World world) => world.Players.Join(JoiningPlayerId);
+
+        internal override void WriteFields(BinaryWriter w) => w.Write(JoiningPlayerId);
+
+        internal static PlayerJoinCommand Read(BinaryReader r) => new PlayerJoinCommand(r.ReadByte());
     }
 }

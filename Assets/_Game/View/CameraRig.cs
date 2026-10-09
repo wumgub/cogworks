@@ -49,6 +49,8 @@ namespace Cogworks.View
             }
         }
 
+        public void SetTarget(Transform newTarget) => target = newTarget;
+
         void ApplyZoom()
         {
             _pixelPerfect.refResolutionX = ZoomLevels[zoomIndex].x;

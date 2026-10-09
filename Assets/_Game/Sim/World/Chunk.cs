@@ -1,3 +1,5 @@
+using System.IO;
+
 namespace Cogworks.Sim
 {
     /// <summary>A square block of tiles. Terrain and ore are generated from the world seed on first access.</summary>
@@ -29,6 +31,26 @@ namespace Cogworks.Sim
         public Int2 Origin => new Int2(Coord.X * Size, Coord.Y * Size);
 
         public void MarkModified() => Modified = true;
+
+        internal void Write(BinaryWriter w)
+        {
+            w.Write(Coord);
+            for (int i = 0; i < Area; i++) w.Write((byte)Terrain[i]);
+            for (int i = 0; i < Area; i++) w.Write((byte)Ore[i]);
+            for (int i = 0; i < Area; i++) w.Write(OreAmount[i]);
+            for (int i = 0; i < Area; i++) w.Write(Occupant[i]);
+        }
+
+        internal static Chunk Read(BinaryReader r)
+        {
+            var c = new Chunk(r.ReadInt2());
+            for (int i = 0; i < Area; i++) c.Terrain[i] = (TerrainType)r.ReadByte();
+            for (int i = 0; i < Area; i++) c.Ore[i] = (Ore)r.ReadByte();
+            for (int i = 0; i < Area; i++) c.OreAmount[i] = r.ReadInt32();
+            for (int i = 0; i < Area; i++) c.Occupant[i] = r.ReadInt32();
+            c.MarkModified();
+            return c;
+        }
 
         internal void AddToHash(ref Fnv64 h)
         {

@@ -1,45 +1,68 @@
+using System;
+using Cogworks.Net;
 using Cogworks.Sim;
 using UnityEngine;
 
 namespace Cogworks.View
 {
-    /// <summary>Creates the simulation and steps it at a fixed tick rate, decoupled from frame rate.</summary>
+    /// <summary>
+    /// Scene-wide access point for the running game. Holds the active <see cref="ISession"/> (single-player,
+    /// host or client), advances it each frame, and tells views when the sim they draw has changed.
+    /// </summary>
     [DefaultExecutionOrder(-100)]
     public sealed class GameBootstrap : MonoBehaviour
     {
-        [SerializeField] uint seed = 12345;
-        [Tooltip("Caps catch-up work after a hitch so the game doesn't spiral.")]
-        [SerializeField] int maxTicksPerFrame = 5;
+        public static GameBootstrap Instance { get; private set; }
 
-        float _accumulator;
+        public ISession Session { get; private set; }
 
-        public Simulation Sim { get; private set; }
+        /// <summary>Null while no game is running (main menu) or a client is waiting for its snapshot.</summary>
+        public Simulation Sim => Session?.Sim;
 
-        /// <summary>Where input sends commands. Swapped for a network sink in multiplayer.</summary>
-        public ICommandSink Commands { get; private set; }
+        public ICommandSink Commands => Session?.Commands;
+        public byte LocalPlayerId => Session?.LocalPlayerId ?? 0;
 
         /// <summary>Fraction of the way to the next tick, for interpolating visuals.</summary>
-        public float TickAlpha => _accumulator * Simulation.TicksPerSecond;
+        public float TickAlpha => Session?.TickAlpha ?? 0f;
+
+        /// <summary>Freezes the sim (single-player pause menu). Multiplayer games never pause.</summary>
+        public bool Paused { get; set; }
+
+        /// <summary>Raised with the new sim (or null when the game ends). Views rebuild from scratch.</summary>
+        public event Action<Simulation> SimChanged;
 
         void Awake()
         {
-            Sim = new Simulation(seed);
-            Commands = new LocalCommandSink(Sim);
+            Instance = this;
         }
+
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+        }
+
+        public void Begin(ISession session)
+        {
+            End();
+            Session = session;
+            Paused = false;
+            session.SimReplaced += OnSimReplaced;
+            if (session.Sim != null) SimChanged?.Invoke(session.Sim);
+        }
+
+        public void End()
+        {
+            if (Session == null) return;
+            Session.SimReplaced -= OnSimReplaced;
+            Session = null;
+            SimChanged?.Invoke(null);
+        }
+
+        void OnSimReplaced(Simulation sim) => SimChanged?.Invoke(sim);
 
         void Update()
         {
-            const float tickLength = 1f / Simulation.TicksPerSecond;
-            _accumulator += Time.deltaTime;
-
-            int steps = 0;
-            while (_accumulator >= tickLength && steps < maxTicksPerFrame)
-            {
-                Sim.Step();
-                _accumulator -= tickLength;
-                steps++;
-            }
-            if (steps == maxTicksPerFrame) _accumulator = 0f;
+            if (!Paused) Session?.Advance(Time.deltaTime);
         }
     }
 }

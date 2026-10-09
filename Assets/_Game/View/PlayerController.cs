@@ -17,15 +17,22 @@ namespace Cogworks.View
         [Tooltip("Half-size of the collision box, in tiles.")]
         [SerializeField] float radius = 0.3f;
 
+        /// <summary>Only the local player's avatar reads input; remote avatars are moved by the network.</summary>
+        public bool IsLocal { get; set; } = true;
+
+        /// <summary>False while a menu has focus. Applies to every avatar on this machine.</summary>
+        public static bool InputEnabled { get; set; } = true;
+
         void Awake()
         {
             GetComponent<SpriteRenderer>().sprite = PlaceholderArt.PlayerSprite();
+            if (bootstrap == null) bootstrap = GameBootstrap.Instance;
         }
 
         void Update()
         {
             var kb = Keyboard.current;
-            if (kb == null) return;
+            if (kb == null || !IsLocal || !InputEnabled || bootstrap.Sim == null) return;
 
             var input = Vector2.zero;
             if (kb.wKey.isPressed || kb.upArrowKey.isPressed) input.y += 1f;

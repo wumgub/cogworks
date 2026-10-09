@@ -1,0 +1,48 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="Menu.uss" />
+    <ui:VisualElement name="menu-root" class="menu-root" picking-mode="Ignore">
+        <ui:Label name="session-info" class="session-info" picking-mode="Ignore" />
+
+        <ui:VisualElement name="main-menu" class="overlay">
+            <ui:VisualElement class="panel">
+                <ui:Label text="COGWORKS" class="title" />
+                <ui:Label text="automate everything" class="subtitle" />
+
+                <ui:Label text="Single player" class="section" />
+                <ui:VisualElement class="row">
+                    <ui:Button name="new-world" text="New World" class="btn btn--primary grow" />
+                    <ui:Button name="continue" text="Continue" class="btn grow gap-left" />
+                </ui:VisualElement>
+
+                <ui:Label text="Multiplayer (up to 4 players)" class="section" />
+                <ui:Toggle name="host-saved" label="Host my saved world" class="toggle" />
+                <ui:Button name="host-online" text="Host Online Game" class="btn" />
+                <ui:VisualElement class="row">
+                    <ui:TextField name="join-code" class="field grow" max-length="12" />
+                    <ui:Button name="join-online" text="Join by Code" class="btn" />
+                </ui:VisualElement>
+
+                <ui:Label text="Local network / direct IP" class="section" />
+                <ui:Button name="host-lan" text="Host LAN Game" class="btn" />
+                <ui:VisualElement class="row">
+                    <ui:TextField name="join-address" class="field grow" value="127.0.0.1" />
+                    <ui:Button name="join-lan" text="Join LAN" class="btn" />
+                </ui:VisualElement>
+
+                <ui:Label name="status" class="status" />
+                <ui:Button name="quit" text="Quit" class="btn btn--quiet" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="pause-menu" class="overlay">
+            <ui:VisualElement class="panel panel--small">
+                <ui:Label text="Paused" class="title title--small" />
+                <ui:Label name="pause-note" class="subtitle" />
+                <ui:Button name="resume" text="Resume" class="btn btn--primary" />
+                <ui:Button name="save" text="Save Game" class="btn" />
+                <ui:Button name="leave" text="Leave to Menu" class="btn" />
+                <ui:Label name="pause-status" class="status" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

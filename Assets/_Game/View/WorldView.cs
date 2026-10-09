@@ -22,10 +22,18 @@ namespace Cogworks.View
         readonly Vector3Int[] _positions = new Vector3Int[Chunk.Area];
         readonly TileBase[] _terrainTiles = new TileBase[Chunk.Area];
         readonly TileBase[] _oreTiles = new TileBase[Chunk.Area];
+        World _world;
 
         void LateUpdate()
         {
-            var world = bootstrap.Sim.World;
+            var world = bootstrap.Sim?.World;
+            if (world != _world)
+            {
+                // New game, resync, or back to menu: everything drawn belongs to the old world.
+                ClearAll();
+                _world = world;
+            }
+            if (world == null) return;
             Vector3 p = focus.position;
             Int2 center = World.TileToChunk(new Int2(Mathf.FloorToInt(p.x), Mathf.FloorToInt(p.y)));
 
@@ -47,6 +55,13 @@ namespace Cogworks.View
                 _shown.Remove(coord);
                 Hide(coord);
             }
+        }
+
+        void ClearAll()
+        {
+            terrainMap.ClearAllTiles();
+            oreMap.ClearAllTiles();
+            _shown.Clear();
         }
 
         void Show(Chunk chunk)

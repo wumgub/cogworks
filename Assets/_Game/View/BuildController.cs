@@ -36,6 +36,15 @@ namespace Cogworks.View
 
         public event Action SelectionChanged;
 
+        /// <summary>False while a menu has focus; build input is ignored and the ghost hidden.</summary>
+        public bool InputEnabled { get; set; } = true;
+
+        /// <summary>Frame on which Esc was used to cancel a tool, so menus don't also open on it.</summary>
+        public int EscapeConsumedFrame { get; private set; } = -1;
+
+        /// <summary>The local avatar, used to stop you building on yourself. Set when it spawns.</summary>
+        public void SetPlayer(PlayerController localPlayer) => player = localPlayer;
+
         void Awake()
         {
             var ghostGo = new GameObject("BuildGhost");
@@ -57,7 +66,12 @@ namespace Cogworks.View
         {
             var kb = Keyboard.current;
             var mouse = Mouse.current;
-            if (kb == null || mouse == null) return;
+            if (kb == null || mouse == null || bootstrap.Sim == null || !InputEnabled)
+            {
+                _ghost.enabled = false;
+                _placing = _removing = false;
+                return;
+            }
 
             Vector2 screen = mouse.position.ReadValue();
             bool overUi = hotbar != null && hotbar.IsPointerOverUI(screen);
@@ -77,7 +91,11 @@ namespace Cogworks.View
 
             if (kb.qKey.wasPressedThisFrame || kb.escapeKey.wasPressedThisFrame)
             {
-                if (Selected != null) Select(-1);
+                if (Selected != null)
+                {
+                    Select(-1);
+                    if (kb.escapeKey.wasPressedThisFrame) EscapeConsumedFrame = Time.frameCount;
+                }
             }
 
             if (kb.rKey.wasPressedThisFrame)

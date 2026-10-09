@@ -14,21 +14,35 @@ namespace Cogworks.View
         readonly Dictionary<int, Transform> _views = new Dictionary<int, Transform>();
         BuildingManager _buildings;
 
-        void Start()
+        void OnEnable()
         {
-            _buildings = bootstrap.Sim.World.Buildings;
+            bootstrap.SimChanged += Bind;
+            Bind(bootstrap.Sim);
+        }
+
+        void OnDisable()
+        {
+            bootstrap.SimChanged -= Bind;
+            Bind(null);
+        }
+
+        void Bind(Simulation sim)
+        {
+            if (_buildings != null)
+            {
+                _buildings.Placed -= OnPlaced;
+                _buildings.Removed -= OnRemoved;
+                _buildings.Changed -= OnChanged;
+            }
+            foreach (var t in _views.Values) Destroy(t.gameObject);
+            _views.Clear();
+
+            _buildings = sim?.World.Buildings;
+            if (_buildings == null) return;
             _buildings.Placed += OnPlaced;
             _buildings.Removed += OnRemoved;
             _buildings.Changed += OnChanged;
             foreach (var b in _buildings.All) OnPlaced(b);
-        }
-
-        void OnDestroy()
-        {
-            if (_buildings == null) return;
-            _buildings.Placed -= OnPlaced;
-            _buildings.Removed -= OnRemoved;
-            _buildings.Changed -= OnChanged;
         }
 
         void OnPlaced(Building b)

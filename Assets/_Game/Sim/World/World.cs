@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 
 namespace Cogworks.Sim
 {
@@ -13,9 +14,11 @@ namespace Cogworks.Sim
         {
             Seed = seed;
             Buildings = new BuildingManager(this);
+            Players = new PlayerManager();
         }
 
         public BuildingManager Buildings { get; }
+        public PlayerManager Players { get; }
 
         public int LoadedChunkCount => _chunks.Count;
 
@@ -54,13 +57,42 @@ namespace Cogworks.Sim
         /// </summary>
         internal void AddToHash(ref Fnv64 h)
         {
+            foreach (long key in ModifiedChunkKeys())
+                _chunks[key].AddToHash(ref h);
+            Buildings.AddToHash(ref h);
+            Players.AddToHash(ref h);
+        }
+
+        /// <summary>Writes everything that isn't regenerable from the seed.</summary>
+        internal void Write(BinaryWriter w)
+        {
+            var keys = ModifiedChunkKeys();
+            w.Write(keys.Count);
+            foreach (long key in keys) _chunks[key].Write(w);
+            Buildings.Write(w);
+            Players.Write(w);
+        }
+
+        internal void Read(BinaryReader r)
+        {
+            _chunks.Clear();
+            int chunkCount = r.ReadInt32();
+            for (int i = 0; i < chunkCount; i++)
+            {
+                var chunk = Chunk.Read(r);
+                _chunks.Add(chunk.Coord.Pack(), chunk);
+            }
+            Buildings.Read(r);
+            Players.Read(r);
+        }
+
+        List<long> ModifiedChunkKeys()
+        {
             var keys = new List<long>();
             foreach (var pair in _chunks)
                 if (pair.Value.Modified) keys.Add(pair.Key);
             keys.Sort();
-            foreach (long key in keys)
-                _chunks[key].AddToHash(ref h);
-            Buildings.AddToHash(ref h);
+            return keys;
         }
     }
 }

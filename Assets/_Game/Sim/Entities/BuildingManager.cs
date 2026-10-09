@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Cogworks.Sim
 {
@@ -108,15 +109,50 @@ namespace Cogworks.Sim
             }
         }
 
+        /// <summary>Buildings in id order (the order the sim updates them in).</summary>
+        public List<Building> SortedById()
+        {
+            var list = new List<Building>(_byId.Values);
+            list.Sort((a, b) => a.Id.CompareTo(b.Id));
+            return list;
+        }
+
+        internal void Write(BinaryWriter w)
+        {
+            w.Write(_nextId);
+            var list = SortedById();
+            w.Write(list.Count);
+            foreach (var b in list)
+            {
+                w.Write(b.Id);
+                w.Write(b.Spec.Id);
+                w.Write(b.Origin);
+                w.Write((byte)b.Direction);
+            }
+        }
+
+        /// <summary>Replaces all buildings. Chunk occupancy is restored by the chunks themselves.</summary>
+        internal void Read(BinaryReader r)
+        {
+            _byId.Clear();
+            _nextId = r.ReadInt32();
+            int count = r.ReadInt32();
+            for (int i = 0; i < count; i++)
+            {
+                int id = r.ReadInt32();
+                ushort specId = r.ReadUInt16();
+                var spec = BuildingCatalog.Get(specId) ?? throw new InvalidDataException($"Unknown building type {specId}");
+                var b = new Building(id, spec, r.ReadInt2(), (Direction)(r.ReadByte() & 3));
+                _byId.Add(id, b);
+            }
+        }
+
         internal void AddToHash(ref Fnv64 h)
         {
             h.Add(_nextId);
-            var ids = new List<int>(_byId.Keys);
-            ids.Sort();
-            foreach (int id in ids)
+            foreach (var b in SortedById())
             {
-                var b = _byId[id];
-                h.Add(id);
+                h.Add(b.Id);
                 h.Add(b.Spec.Id);
                 h.Add(b.Origin.Pack());
                 h.Add((byte)b.Direction);

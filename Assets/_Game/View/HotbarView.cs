@@ -12,6 +12,7 @@ namespace Cogworks.View
 
         [SerializeField] BuildController build;
 
+        VisualElement _root;
         VisualElement[] _slots;
         Label _selectedName;
         IPanel _panel;
@@ -20,6 +21,7 @@ namespace Cogworks.View
         void Start()
         {
             var root = GetComponent<UIDocument>().rootVisualElement;
+            _root = root.Q<VisualElement>("hud-root");
             _panel = root.panel;
             _selectedName = root.Q<Label>("selected-name");
             var bar = root.Q<VisualElement>("hotbar");
@@ -54,6 +56,13 @@ namespace Cogworks.View
         void OnDestroy()
         {
             if (build != null) build.SelectionChanged -= Refresh;
+        }
+
+        void Update()
+        {
+            // Hidden on the main menu and while a client waits for its world.
+            if (_root != null)
+                _root.style.display = GameBootstrap.Instance?.Sim != null ? DisplayStyle.Flex : DisplayStyle.None;
         }
 
         void Refresh()

@@ -4,6 +4,9 @@
     "references": [
         "Cogworks.Sim",
         "Cogworks.View",
+        "Cogworks.Game",
+        "Unity.Netcode.Runtime",
+        "Unity.Networking.Transport",
         "Unity.RenderPipelines.Universal.Runtime",
         "Unity.RenderPipelines.Universal.2D.Runtime"
     ],

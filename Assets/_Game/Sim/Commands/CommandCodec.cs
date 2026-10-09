@@ -21,6 +21,7 @@ namespace Cogworks.Sim
                 CommandType.PlaceBuilding => PlaceBuildingCommand.Read(reader),
                 CommandType.RemoveBuilding => RemoveBuildingCommand.Read(reader),
                 CommandType.SetBuildingDirection => SetBuildingDirectionCommand.Read(reader),
+                CommandType.PlayerJoin => PlayerJoinCommand.Read(reader),
                 _ => throw new InvalidDataException($"Unknown command type {(byte)type}"),
             };
             command.PlayerId = playerId;

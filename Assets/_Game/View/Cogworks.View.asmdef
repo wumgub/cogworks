@@ -3,6 +3,7 @@
     "rootNamespace": "Cogworks.View",
     "references": [
         "Cogworks.Sim",
+        "Cogworks.Net",
         "Unity.InputSystem",
         "Unity.RenderPipelines.Universal.Runtime",
         "Unity.RenderPipelines.Universal.2D.Runtime"

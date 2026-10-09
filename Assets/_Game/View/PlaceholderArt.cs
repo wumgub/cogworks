@@ -16,7 +16,16 @@ namespace Cogworks.View
         static readonly Dictionary<TerrainType, Tile> TerrainTiles = new Dictionary<TerrainType, Tile>();
         static readonly Dictionary<Ore, Tile> OreTiles = new Dictionary<Ore, Tile>();
         static readonly Dictionary<ushort, Sprite> BuildingSprites = new Dictionary<ushort, Sprite>();
-        static Sprite _player;
+        static readonly Sprite[] PlayerSprites = new Sprite[4];
+
+        // One body color per player slot so co-op players can tell each other apart.
+        static readonly Color32[] PlayerColors =
+        {
+            new Color32(230, 140, 50, 255),
+            new Color32(70, 170, 230, 255),
+            new Color32(120, 200, 90, 255),
+            new Color32(200, 110, 210, 255),
+        };
 
         public static Tile TerrainTile(TerrainType terrain)
         {
@@ -39,13 +48,14 @@ namespace Cogworks.View
             return tile;
         }
 
-        public static Sprite PlayerSprite()
+        public static Sprite PlayerSprite(int slot = 0)
         {
-            if (_player != null) return _player;
+            slot = Mathf.Abs(slot) % PlayerSprites.Length;
+            if (PlayerSprites[slot] != null) return PlayerSprites[slot];
 
             var px = new Color32[PixelsPerUnit * PixelsPerUnit];
-            var body = new Color32(230, 140, 50, 255);
-            var outline = new Color32(90, 45, 20, 255);
+            var body = PlayerColors[slot];
+            var outline = Shade(body, -110);
             var visor = new Color32(120, 210, 240, 255);
             for (int y = 1; y < 15; y++)
             for (int x = 3; x < 13; x++)
@@ -54,8 +64,8 @@ namespace Cogworks.View
                 bool isVisor = y >= 9 && y <= 11 && x >= 5 && x <= 10;
                 px[y * PixelsPerUnit + x] = edge ? outline : isVisor ? visor : body;
             }
-            _player = MakeSprite(px, "Player");
-            return _player;
+            PlayerSprites[slot] = MakeSprite(px, "Player" + slot);
+            return PlayerSprites[slot];
         }
 
         /// <summary>
