@@ -57,7 +57,7 @@ namespace Cogworks.Sim
             Output.IsEmpty || (Output.Item == recipe.Output.Item && Output.Count + recipe.Output.Count <= OutputCap);
 
         /// <summary>Switches recipe, moving everything inside into <paramref name="refund"/>.</summary>
-        internal void SetRecipe(ushort recipeId, List<ItemStack> refund)
+        public void SetRecipe(ushort recipeId, List<ItemStack> refund)
         {
             if (recipeId == RecipeId) return;
             CollectContents(refund);

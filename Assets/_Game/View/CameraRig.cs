@@ -51,6 +51,12 @@ namespace Cogworks.View
 
         public void SetTarget(Transform newTarget) => target = newTarget;
 
+        public void SetZoom(int index)
+        {
+            zoomIndex = Mathf.Clamp(index, 0, ZoomLevels.Length - 1);
+            if (_pixelPerfect != null) ApplyZoom();
+        }
+
         void ApplyZoom()
         {
             _pixelPerfect.refResolutionX = ZoomLevels[zoomIndex].x;

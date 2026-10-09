@@ -31,7 +31,9 @@ namespace Cogworks.View
             {
                 // New game, resync, or back to menu: everything drawn belongs to the old world.
                 ClearAll();
+                if (_world != null) _world.TileChanged -= OnTileChanged;
                 _world = world;
+                if (_world != null) _world.TileChanged += OnTileChanged;
             }
             if (world == null) return;
             Vector3 p = focus.position;
@@ -55,6 +57,14 @@ namespace Cogworks.View
                 _shown.Remove(coord);
                 Hide(coord);
             }
+        }
+
+        void OnTileChanged(Int2 tile)
+        {
+            if (!_shown.Contains(World.TileToChunk(tile))) return;
+            var pos = new Vector3Int(tile.X, tile.Y, 0);
+            terrainMap.SetTile(pos, PlaceholderArt.TerrainTile(_world.GetTerrain(tile)));
+            oreMap.SetTile(pos, PlaceholderArt.OreTile(_world.GetOre(tile, out _)));
         }
 
         void ClearAll()

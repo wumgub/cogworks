@@ -27,6 +27,7 @@ namespace Cogworks.Editor
         {
             // Clients must keep simulating while their window is in the background.
             PlayerSettings.runInBackground = true;
+            DisablePostProcessing();
             var avatarPrefab = BuildAvatarPrefab();
 
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
@@ -37,7 +38,7 @@ namespace Cogworks.Editor
             camera.orthographic = true;
             camera.clearFlags = CameraClearFlags.SolidColor;
             camera.backgroundColor = new Color32(20, 22, 28, 255);
-            cameraGo.AddComponent<UniversalAdditionalCameraData>();
+            cameraGo.AddComponent<UniversalAdditionalCameraData>().renderPostProcessing = false;
             cameraGo.AddComponent<AudioListener>();
             var pixelPerfect = cameraGo.AddComponent<PixelPerfectCamera>();
             pixelPerfect.assetsPPU = PlaceholderArt.PixelsPerUnit;
@@ -58,6 +59,7 @@ namespace Cogworks.Editor
             var worldView = gameGo.AddComponent<WorldView>();
             var buildingsView = gameGo.AddComponent<BuildingsView>();
             var build = gameGo.AddComponent<BuildController>();
+            var beltItems = gameGo.AddComponent<BeltItemsView>();
 
             var panelSettings = GetOrCreatePanelSettings();
             var hudGo = new GameObject("HUD");
@@ -65,6 +67,13 @@ namespace Cogworks.Editor
             hudDoc.panelSettings = panelSettings;
             hudDoc.visualTreeAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(UiDir + "/Hud.uxml");
             var hotbar = hudGo.AddComponent<HotbarView>();
+
+            var panelsGo = new GameObject("Panels");
+            var panelsDoc = panelsGo.AddComponent<UIDocument>();
+            panelsDoc.panelSettings = panelSettings;
+            panelsDoc.visualTreeAsset = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>(UiDir + "/Panels.uxml");
+            panelsDoc.sortingOrder = 5;
+            var panels = panelsGo.AddComponent<PanelsController>();
 
             var menuGo = new GameObject("Menu");
             var menuDoc = menuGo.AddComponent<UIDocument>();
@@ -97,15 +106,35 @@ namespace Cogworks.Editor
             Wire(buildingsView, ("bootstrap", bootstrap));
             Wire(build, ("bootstrap", bootstrap), ("worldCamera", camera), ("hotbar", hotbar));
             Wire(hotbar, ("build", build));
+            Wire(beltItems, ("bootstrap", bootstrap), ("worldCamera", camera));
+            Wire(panels, ("bootstrap", bootstrap), ("build", build));
             Wire(netGame, ("bootstrap", bootstrap), ("network", network), ("transport", transport),
                 ("avatarPrefab", avatarPrefab), ("cameraRig", rig), ("build", build));
-            Wire(menu, ("game", netGame), ("bootstrap", bootstrap), ("build", build));
-            Wire(launcher, ("game", netGame), ("bootstrap", bootstrap));
+            Wire(menu, ("game", netGame), ("bootstrap", bootstrap), ("build", build), ("panels", panels));
+            Wire(launcher, ("game", netGame), ("bootstrap", bootstrap), ("panels", panels), ("cameraRig", rig));
 
             EditorSceneManager.SaveScene(scene, ScenePath);
             EditorBuildSettings.scenes = new[] { new EditorBuildSettingsScene(ScenePath, true) };
             AssetDatabase.SaveAssets();
             Debug.Log($"[Cogworks] Built {ScenePath}");
+        }
+
+        /// <summary>
+        /// Pixel art doesn't use post-processing; without this the 2D renderer sets up passes whose shaders
+        /// are stripped from builds and logs warnings every frame.
+        /// </summary>
+        static void DisablePostProcessing()
+        {
+            var renderer = AssetDatabase.LoadAssetAtPath<Object>("Assets/Settings/Renderer2D.asset");
+            if (renderer == null) return;
+            var so = new SerializedObject(renderer);
+            var prop = so.FindProperty("m_PostProcessData");
+            if (prop != null && prop.objectReferenceValue != null)
+            {
+                prop.objectReferenceValue = null;
+                so.ApplyModifiedPropertiesWithoutUndo();
+                AssetDatabase.SaveAssets();
+            }
         }
 
         static PlayerAvatar BuildAvatarPrefab()

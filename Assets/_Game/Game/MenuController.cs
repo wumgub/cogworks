@@ -14,11 +14,12 @@ namespace Cogworks.Game
         [SerializeField] NetworkGame game;
         [SerializeField] GameBootstrap bootstrap;
         [SerializeField] BuildController build;
+        [SerializeField] PanelsController panels;
 
         VisualElement _main, _pause;
         Label _status, _pauseStatus, _pauseNote, _sessionInfo;
         TextField _joinCode, _joinAddress;
-        Toggle _hostSaved;
+        Toggle _hostSaved, _sandbox;
         Button _continue, _save, _hostOnline, _joinOnline, _hostLan, _joinLan, _newWorld;
         bool _pauseOpen;
 
@@ -36,6 +37,7 @@ namespace Cogworks.Game
             _joinCode = root.Q<TextField>("join-code");
             _joinAddress = root.Q<TextField>("join-address");
             _hostSaved = root.Q<Toggle>("host-saved");
+            _sandbox = root.Q<Toggle>("new-sandbox");
             _joinCode.textEdition.placeholder = "Join code";
 
             _newWorld = Wire(root, "new-world", () => game.StartSinglePlayer(NewWorld()));
@@ -70,13 +72,14 @@ namespace Cogworks.Game
         {
             var kb = Keyboard.current;
             if (kb != null && kb.escapeKey.wasPressedThisFrame && game.Mode != GameMode.None
-                && build.EscapeConsumedFrame != Time.frameCount)
+                && build.EscapeConsumedFrame != Time.frameCount && panels.EscapeConsumedFrame != Time.frameCount)
             {
                 SetPause(!_pauseOpen);
             }
 
             bool open = MenuOpen;
-            build.InputEnabled = !open;
+            build.InputEnabled = !open && !panels.AnyOpen;
+            panels.KeysEnabled = !open;
             PlayerController.InputEnabled = !open;
             _sessionInfo.text = SessionInfo();
             _sessionInfo.style.display = string.IsNullOrEmpty(_sessionInfo.text) ? DisplayStyle.None : DisplayStyle.Flex;
@@ -121,7 +124,7 @@ namespace Cogworks.Game
             }
         }
 
-        static Simulation NewWorld() => new Simulation((uint)Environment.TickCount);
+        Simulation NewWorld() => new Simulation((uint)Environment.TickCount, _sandbox.value);
 
         Simulation WorldForHosting()
         {

@@ -7,9 +7,11 @@ using UnityEngine.InputSystem;
 namespace Cogworks.View
 {
     /// <summary>
-    /// Build-mode input: hotbar selection, placement preview, rotate, drag-place and drag-remove.
-    /// Never touches the world directly; it only reads it for previews and submits commands.
+    /// World input: hotbar tools, placement preview, rotate, drag-place and drag-remove, plus (with no tool)
+    /// clicking buildings, hand-mining ore, cranking and pipette. Never touches the world directly; it only
+    /// reads it for previews and submits commands.
     /// </summary>
+    [DefaultExecutionOrder(-20)]
     public sealed class BuildController : MonoBehaviour
     {
         [SerializeField] GameBootstrap bootstrap;
@@ -17,9 +19,19 @@ namespace Cogworks.View
         [SerializeField] HotbarView hotbar;
         [SerializeField] PlayerController player;
 
+        /// <summary>Buildings on number keys 1-9, 0. Everything else is picked from the inventory.</summary>
+        public static readonly BuildingSpec[] HotbarSlots =
+        {
+            BuildingCatalog.Conveyor, BuildingCatalog.Inserter, BuildingCatalog.Chest, BuildingCatalog.Drill,
+            BuildingCatalog.Furnace, BuildingCatalog.Assembler, BuildingCatalog.Shaft, BuildingCatalog.Gearbox,
+            BuildingCatalog.HandCrank, BuildingCatalog.WaterWheel,
+        };
+
         static readonly Color GhostValid = new Color(0.55f, 1f, 0.55f, 0.65f);
         static readonly Color GhostInvalid = new Color(1f, 0.35f, 0.35f, 0.65f);
         const int GhostSortingOrder = 20;
+        // Client-side pacing for hand mining; the sim enforces its own cooldown.
+        const float MineInterval = 0.35f;
 
         SpriteRenderer _ghost;
         bool _placing;
@@ -29,14 +41,29 @@ namespace Cogworks.View
         Direction _lastPlacedDir;
         bool _removing;
         Int2? _lastRemoveTile;
+        bool _mining;
+        float _nextMineTime;
+        float _nextOutOfItemMessage;
 
-        public int SelectedIndex { get; private set; } = -1;
+        public BuildingSpec Selected { get; private set; }
         public Direction Direction { get; private set; } = Direction.North;
-        public BuildingSpec Selected => SelectedIndex >= 0 ? BuildingCatalog.All[SelectedIndex] : null;
+
+        /// <summary>Building under the cursor (null if none or over UI).</summary>
+        public Building Hovered { get; private set; }
+
+        /// <summary>Tile under the cursor.</summary>
+        public Int2 CursorTile { get; private set; }
+
+        /// <summary>True while hand-mining is in progress.</summary>
+        public bool IsMining => _mining;
 
         public event Action SelectionChanged;
+        /// <summary>Raised when a building is clicked with no tool selected (opens its panel).</summary>
+        public event Action<Building> BuildingClicked;
+        /// <summary>Short feedback for the player (e.g. "Out of Conveyor Belt").</summary>
+        public event Action<string> Message;
 
-        /// <summary>False while a menu has focus; build input is ignored and the ghost hidden.</summary>
+        /// <summary>False while a menu or panel has focus; world input is ignored and the ghost hidden.</summary>
         public bool InputEnabled { get; set; } = true;
 
         /// <summary>Frame on which Esc was used to cancel a tool, so menus don't also open on it.</summary>
@@ -54,12 +81,26 @@ namespace Cogworks.View
             _ghost.enabled = false;
         }
 
-        /// <summary>Selects a hotbar slot; selecting the active slot again clears it.</summary>
-        public void Select(int index)
+        /// <summary>Selects a building tool; selecting the active one again (or null) clears it.</summary>
+        public void Select(BuildingSpec spec)
         {
-            SelectedIndex = index == SelectedIndex || index < 0 || index >= BuildingCatalog.All.Count ? -1 : index;
+            Selected = spec == Selected ? null : spec;
             if (Selected != null && !Selected.Rotatable) Direction = Direction.North;
             SelectionChanged?.Invoke();
+        }
+
+        public void SelectSlot(int slot)
+        {
+            if (slot >= 0 && slot < HotbarSlots.Length) Select(HotbarSlots[slot]);
+        }
+
+        /// <summary>How many of this building the local player can place (int.MaxValue in sandbox).</summary>
+        public int Available(BuildingSpec spec)
+        {
+            var sim = bootstrap.Sim;
+            if (sim == null) return 0;
+            if (sim.World.Sandbox) return int.MaxValue;
+            return bootstrap.LocalPlayer?.Inventory.Count(spec.ItemId) ?? 0;
         }
 
         void Update()
@@ -69,7 +110,8 @@ namespace Cogworks.View
             if (kb == null || mouse == null || bootstrap.Sim == null || !InputEnabled)
             {
                 _ghost.enabled = false;
-                _placing = _removing = false;
+                _placing = _removing = _mining = false;
+                Hovered = null;
                 return;
             }
 
@@ -77,26 +119,39 @@ namespace Cogworks.View
             bool overUi = hotbar != null && hotbar.IsPointerOverUI(screen);
             Vector3 w = worldCamera.ScreenToWorldPoint(new Vector3(screen.x, screen.y, -worldCamera.transform.position.z));
             var cursor = new Int2(Mathf.FloorToInt(w.x), Mathf.FloorToInt(w.y));
+            CursorTile = cursor;
+            Hovered = overUi ? null : bootstrap.Sim.World.Buildings.GetAt(cursor);
 
             HandleKeys(kb, cursor);
-            HandlePlacing(mouse, cursor, overUi);
+            if (Selected != null) HandlePlacing(mouse, cursor, overUi);
+            else HandleInteract(mouse, cursor, overUi);
             HandleRemoving(mouse, cursor, overUi);
             UpdateGhost(cursor, overUi);
         }
 
         void HandleKeys(Keyboard kb, Int2 cursor)
         {
-            for (int i = 0; i < BuildingCatalog.All.Count && i < 9; i++)
-                if (kb[Key.Digit1 + i].wasPressedThisFrame) Select(i);
-
-            if (kb.qKey.wasPressedThisFrame || kb.escapeKey.wasPressedThisFrame)
+            for (int i = 0; i < HotbarSlots.Length; i++)
             {
-                if (Selected != null)
-                {
-                    Select(-1);
-                    if (kb.escapeKey.wasPressedThisFrame) EscapeConsumedFrame = Time.frameCount;
-                }
+                var key = i == 9 ? Key.Digit0 : Key.Digit1 + i;
+                if (kb[key].wasPressedThisFrame) SelectSlot(i);
             }
+
+            if (kb.escapeKey.wasPressedThisFrame && Selected != null)
+            {
+                Select(null);
+                EscapeConsumedFrame = Time.frameCount;
+            }
+
+            if (kb.qKey.wasPressedThisFrame)
+            {
+                // Q clears the tool, or with no tool picks up the hovered building's type (pipette).
+                if (Selected != null) Select(null);
+                else if (Hovered != null) Select(Hovered.Spec);
+            }
+
+            if (kb.eKey.wasPressedThisFrame && Hovered?.Spec == BuildingCatalog.HandCrank)
+                bootstrap.Commands.Submit(new CrankCommand(Hovered.Origin));
 
             if (kb.rKey.wasPressedThisFrame)
             {
@@ -105,28 +160,36 @@ namespace Cogworks.View
                 {
                     if (Selected.Rotatable) Direction = reverse ? Direction.RotateCcw() : Direction.RotateCw();
                 }
-                else
+                else if (Hovered != null && Hovered.Spec.Rotatable)
                 {
-                    // No tool selected: rotate the building under the cursor.
-                    var b = bootstrap.Sim.World.Buildings.GetAt(cursor);
-                    if (b != null && b.Spec.Rotatable)
-                    {
-                        var next = reverse ? b.Direction.RotateCcw() : b.Direction.RotateCw();
-                        bootstrap.Commands.Submit(new SetBuildingDirectionCommand(cursor, next));
-                    }
+                    var next = reverse ? Hovered.Direction.RotateCcw() : Hovered.Direction.RotateCw();
+                    bootstrap.Commands.Submit(new SetBuildingDirectionCommand(cursor, next));
                 }
             }
         }
 
+        /// <summary>No tool: click a building to open it, hold on bare ore to mine it by hand.</summary>
+        void HandleInteract(Mouse mouse, Int2 cursor, bool overUi)
+        {
+            _placing = false;
+            if (mouse.leftButton.wasPressedThisFrame && !overUi)
+            {
+                if (Hovered != null) BuildingClicked?.Invoke(Hovered);
+                else _mining = true;
+            }
+            if (!mouse.leftButton.isPressed) _mining = false;
+            if (!_mining || Hovered != null) return;
+
+            if (bootstrap.Sim.World.GetOre(cursor, out int amount) == Ore.None || amount <= 0) return;
+            if (Time.time < _nextMineTime) return;
+            _nextMineTime = Time.time + MineInterval;
+            bootstrap.Commands.Submit(new MineTileCommand(cursor));
+        }
+
         void HandlePlacing(Mouse mouse, Int2 cursor, bool overUi)
         {
+            _mining = false;
             var spec = Selected;
-            if (spec == null)
-            {
-                _placing = false;
-                return;
-            }
-
             if (mouse.leftButton.wasPressedThisFrame && !overUi)
             {
                 _placing = true;
@@ -164,6 +227,15 @@ namespace Cogworks.View
             Int2 origin = OriginFor(spec, cursor, Direction);
             // Pre-check to avoid flooding the sink; the command re-validates when it runs.
             if (!CanPlaceLocally(spec, origin)) return;
+            if (Available(spec) <= 0)
+            {
+                if (Time.time >= _nextOutOfItemMessage)
+                {
+                    Message?.Invoke($"Out of {spec.DisplayName}. Craft more (Tab).");
+                    _nextOutOfItemMessage = Time.time + 2f;
+                }
+                return;
+            }
             bootstrap.Commands.Submit(new PlaceBuildingCommand(spec.Id, origin, Direction));
             _lastPlacedAt = cursor;
             _lastPlacedDir = Direction;
@@ -192,7 +264,7 @@ namespace Cogworks.View
 
             Int2 origin = OriginFor(spec, cursor, Direction);
             _ghost.sprite = PlaceholderArt.BuildingSprite(spec);
-            _ghost.color = CanPlaceLocally(spec, origin) ? GhostValid : GhostInvalid;
+            _ghost.color = CanPlaceLocally(spec, origin) && Available(spec) > 0 ? GhostValid : GhostInvalid;
             BuildingsView.Pose(_ghost.transform, spec, origin, Direction);
         }
 

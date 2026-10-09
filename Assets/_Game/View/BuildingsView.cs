@@ -11,8 +11,15 @@ namespace Cogworks.View
 
         [SerializeField] GameBootstrap bootstrap;
 
+        // Cogs spin at the network's speed (6°/s per rpm, i.e. one turn per minute per rpm, sped up for visibility).
+        const float CogDegreesPerRpmSecond = 6f * 4f;
+        static readonly Color CogStopped = new Color(0.6f, 0.6f, 0.6f, 0.7f);
+        static readonly Color CogOverstressed = new Color(1f, 0.3f, 0.25f, 0.95f);
+
         readonly Dictionary<int, Transform> _views = new Dictionary<int, Transform>();
+        readonly Dictionary<int, SpriteRenderer> _cogs = new Dictionary<int, SpriteRenderer>();
         BuildingManager _buildings;
+        Simulation _sim;
 
         void OnEnable()
         {
@@ -35,8 +42,11 @@ namespace Cogworks.View
                 _buildings.Changed -= OnChanged;
             }
             foreach (var t in _views.Values) Destroy(t.gameObject);
+            foreach (var c in _cogs.Values) Destroy(c.gameObject);
             _views.Clear();
+            _cogs.Clear();
 
+            _sim = sim;
             _buildings = sim?.World.Buildings;
             if (_buildings == null) return;
             _buildings.Placed += OnPlaced;
@@ -54,11 +64,40 @@ namespace Cogworks.View
             sr.sortingOrder = SortingOrder;
             Pose(go.transform, b.Spec, b.Origin, b.Direction);
             _views.Add(b.Id, go.transform);
+
+            if (b.Spec.Kinetic != KineticRole.None && b.Spec.Kinetic != KineticRole.Shaft)
+            {
+                // Separate object so it doesn't inherit the building's rotation.
+                var cog = new GameObject("Cog").AddComponent<SpriteRenderer>();
+                cog.transform.SetParent(transform, false);
+                cog.transform.localPosition = go.transform.localPosition;
+                cog.transform.localScale = Vector3.one * (b.Spec.Width > 1 ? 0.75f : 0.55f);
+                cog.sprite = PlaceholderArt.CogSprite();
+                cog.sortingOrder = SortingOrder + 1;
+                _cogs.Add(b.Id, cog);
+            }
+        }
+
+        void LateUpdate()
+        {
+            if (_sim == null) return;
+            var kinetics = _sim.World.Kinetics;
+            float dt = Time.deltaTime;
+            foreach (var pair in _cogs)
+            {
+                var b = _buildings.Get(pair.Key);
+                var net = kinetics.NetworkOf(b);
+                int rpm = net?.EffectiveRpm ?? 0;
+                var cog = pair.Value;
+                cog.color = net != null && net.Overstressed ? CogOverstressed : rpm == 0 ? CogStopped : Color.white;
+                if (rpm != 0) cog.transform.Rotate(0f, 0f, -rpm * CogDegreesPerRpmSecond * dt);
+            }
         }
 
         void OnRemoved(Building b)
         {
             if (_views.Remove(b.Id, out var t)) Destroy(t.gameObject);
+            if (_cogs.Remove(b.Id, out var cog)) Destroy(cog.gameObject);
         }
 
         void OnChanged(Building b)

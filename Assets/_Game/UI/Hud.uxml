@@ -1,9 +1,12 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
     <Style src="Hud.uss" />
     <ui:VisualElement name="hud-root" class="hud-root" picking-mode="Ignore">
+        <ui:Label name="toast" class="toast" picking-mode="Ignore" />
+        <ui:VisualElement class="spacer" picking-mode="Ignore" />
+        <ui:Label name="hover-info" class="hover-info" picking-mode="Ignore" />
         <ui:Label name="selected-name" class="selected-name" picking-mode="Ignore" />
         <ui:VisualElement name="hotbar" class="hotbar" />
         <ui:Label name="hint" class="hint" picking-mode="Ignore"
-                  text="1-8 select  ·  R rotate (Shift+R back)  ·  LMB place / drag  ·  RMB remove  ·  Q / Esc cancel" />
+                  text="1-0 tools · R rotate · Q clear/pipette · E crank · LMB place / open / mine · RMB remove · Tab inventory · T research" />
     </ui:VisualElement>
 </ui:UXML>

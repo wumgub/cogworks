@@ -1,0 +1,318 @@
+.panels-root {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    align-items: center;
+    justify-content: center;
+    /* Keep windows clear of the hotbar. */
+    padding-top: 12px;
+    padding-bottom: 104px;
+}
+
+.window {
+    width: 430px;
+    max-height: 100%;
+    padding: 10px 12px 12px 12px;
+    background-color: rgba(26, 29, 36, 0.97);
+    border-width: 2px;
+    border-color: rgb(70, 75, 88);
+    border-radius: 5px;
+}
+
+.window--wide {
+    width: 740px;
+}
+
+.window-header {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.window-title {
+    flex-grow: 1;
+    font-size: 17px;
+    -unity-font-style: bold;
+    color: rgb(240, 180, 60);
+}
+
+.close-btn {
+    width: 26px;
+    height: 24px;
+    background-color: rgb(46, 50, 60);
+    border-color: rgb(80, 85, 98);
+    color: rgb(220, 220, 228);
+}
+
+.close-btn:hover {
+    background-color: rgb(140, 50, 50);
+}
+
+.columns {
+    flex-direction: row;
+}
+
+.column {
+    width: 380px;
+}
+
+.column--grow {
+    flex-grow: 1;
+    flex-shrink: 1;
+    width: auto;
+    margin-left: 12px;
+}
+
+.section-label {
+    margin-top: 8px;
+    margin-bottom: 3px;
+    font-size: 11px;
+    color: rgb(150, 154, 166);
+    -unity-font-style: bold;
+}
+
+.hint-line {
+    font-size: 12px;
+    color: rgb(170, 174, 186);
+    white-space: normal;
+    margin-bottom: 6px;
+}
+
+.status-line {
+    font-size: 13px;
+    color: rgb(235, 235, 240);
+}
+
+.network-line {
+    font-size: 12px;
+    color: rgb(140, 200, 240);
+}
+
+.grid {
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.grid--10 {
+    width: 380px;
+}
+
+.item-slot {
+    width: 36px;
+    height: 36px;
+    margin: 1px;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(38, 42, 50);
+    border-width: 1px;
+    border-color: rgb(62, 66, 76);
+    border-radius: 2px;
+}
+
+.item-slot:hover {
+    border-color: rgb(160, 164, 174);
+    background-color: rgb(48, 53, 63);
+}
+
+.item-slot--big {
+    width: 44px;
+    height: 44px;
+}
+
+.item-icon {
+    width: 26px;
+    height: 26px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.item-count {
+    position: absolute;
+    right: 2px;
+    bottom: 0;
+    font-size: 11px;
+    -unity-font-style: bold;
+    color: rgb(240, 240, 245);
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgb(10, 10, 12);
+}
+
+.labeled-slot {
+    align-items: center;
+    margin-right: 10px;
+}
+
+.labeled-slot > Label {
+    font-size: 10px;
+    color: rgb(150, 154, 166);
+}
+
+.row {
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.machine-body {
+    margin-top: 6px;
+    padding: 8px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+}
+
+.bar {
+    height: 8px;
+    margin: 4px 0;
+    background-color: rgb(20, 22, 28);
+    border-radius: 2px;
+    flex-grow: 1;
+}
+
+.bar-fill {
+    height: 100%;
+    background-color: rgb(240, 180, 60);
+    border-radius: 2px;
+}
+
+.bar-fill--fuel {
+    background-color: rgb(230, 100, 50);
+}
+
+.bar-fill--research {
+    background-color: rgb(110, 190, 240);
+}
+
+.bar-label {
+    font-size: 11px;
+    color: rgb(180, 184, 196);
+    width: 90px;
+}
+
+.craft-list {
+    max-height: 380px;
+}
+
+.craft-row {
+    flex-direction: row;
+    align-items: center;
+    padding: 3px 4px;
+    margin-bottom: 2px;
+    background-color: rgb(36, 40, 48);
+    border-radius: 3px;
+}
+
+.craft-row:hover {
+    background-color: rgb(52, 58, 70);
+}
+
+.craft-row--unaffordable {
+    opacity: 0.45;
+}
+
+.craft-text {
+    flex-grow: 1;
+    flex-shrink: 1;
+    margin-left: 6px;
+}
+
+.craft-name {
+    font-size: 12px;
+    color: rgb(235, 235, 240);
+    -unity-font-style: bold;
+}
+
+.craft-inputs {
+    font-size: 10px;
+    color: rgb(160, 164, 176);
+    white-space: normal;
+}
+
+.queue {
+    flex-direction: row;
+    flex-wrap: wrap;
+    min-height: 44px;
+}
+
+.recipe-grid {
+    flex-direction: row;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+}
+
+.recipe-btn {
+    width: 38px;
+    height: 38px;
+    margin: 1px;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(38, 42, 50);
+    border-width: 2px;
+    border-color: rgb(62, 66, 76);
+    border-radius: 3px;
+}
+
+.recipe-btn:hover {
+    border-color: rgb(160, 164, 174);
+}
+
+.recipe-btn--selected {
+    border-color: rgb(240, 180, 60);
+    background-color: rgb(72, 60, 36);
+}
+
+.action-btn {
+    height: 28px;
+    margin-top: 6px;
+    background-color: rgb(150, 105, 30);
+    border-color: rgb(240, 180, 60);
+    color: rgb(255, 248, 230);
+    -unity-font-style: bold;
+}
+
+.tech-list {
+    max-height: 440px;
+}
+
+.tech-row {
+    padding: 6px 8px;
+    margin-bottom: 4px;
+    background-color: rgb(36, 40, 48);
+    border-width: 1px;
+    border-color: rgb(56, 60, 70);
+    border-radius: 3px;
+}
+
+.tech-row--available:hover {
+    background-color: rgb(52, 58, 70);
+    border-color: rgb(140, 144, 156);
+}
+
+.tech-row--current {
+    border-color: rgb(110, 190, 240);
+}
+
+.tech-row--done {
+    opacity: 0.6;
+}
+
+.tech-row--locked {
+    opacity: 0.45;
+}
+
+.tech-name {
+    font-size: 14px;
+    -unity-font-style: bold;
+    color: rgb(235, 235, 240);
+}
+
+.tech-desc {
+    font-size: 11px;
+    color: rgb(170, 174, 186);
+    white-space: normal;
+}
+
+.tech-state {
+    font-size: 11px;
+    color: rgb(240, 200, 120);
+}

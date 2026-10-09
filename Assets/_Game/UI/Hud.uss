@@ -2,9 +2,34 @@
     position: absolute;
     left: 0;
     right: 0;
+    top: 0;
     bottom: 0;
     align-items: center;
+    padding-top: 12px;
     padding-bottom: 12px;
+}
+
+.spacer {
+    flex-grow: 1;
+}
+
+.toast {
+    padding: 6px 14px;
+    font-size: 14px;
+    color: rgb(255, 240, 200);
+    background-color: rgba(20, 22, 28, 0.85);
+    border-radius: 4px;
+    border-width: 1px;
+    border-color: rgb(240, 180, 60);
+}
+
+.hover-info {
+    margin-bottom: 4px;
+    padding: 3px 8px;
+    font-size: 12px;
+    color: rgb(225, 228, 235);
+    background-color: rgba(20, 22, 28, 0.75);
+    border-radius: 3px;
 }
 
 .selected-name {
@@ -70,4 +95,19 @@
     color: rgba(235, 235, 240, 0.65);
     -unity-text-outline-width: 1px;
     -unity-text-outline-color: rgba(20, 22, 28, 0.8);
+}
+
+.slot-count {
+    position: absolute;
+    right: 3px;
+    bottom: 1px;
+    font-size: 11px;
+    -unity-font-style: bold;
+    color: rgb(240, 240, 245);
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgb(10, 10, 12);
+}
+
+.slot--empty > .slot-icon {
+    opacity: 0.35;
 }

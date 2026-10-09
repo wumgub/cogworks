@@ -22,6 +22,9 @@ namespace Cogworks.View
         public ICommandSink Commands => Session?.Commands;
         public byte LocalPlayerId => Session?.LocalPlayerId ?? 0;
 
+        /// <summary>This machine's player in the sim (null before they've joined).</summary>
+        public PlayerState LocalPlayer => Sim?.World.Players.Get(LocalPlayerId);
+
         /// <summary>Fraction of the way to the next tick, for interpolating visuals.</summary>
         public float TickAlpha => Session?.TickAlpha ?? 0f;
 

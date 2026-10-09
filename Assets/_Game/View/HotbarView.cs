@@ -4,18 +4,23 @@ using UnityEngine.UIElements;
 
 namespace Cogworks.View
 {
-    /// <summary>UI Toolkit hotbar bound to <see cref="BuildController"/> selection.</summary>
+    /// <summary>In-game HUD: tool hotbar with item counts, hover info, and toast messages.</summary>
     [RequireComponent(typeof(UIDocument))]
     public sealed class HotbarView : MonoBehaviour
     {
         const string SelectedClass = "slot--selected";
+        const string EmptyClass = "slot--empty";
+        const float ToastSeconds = 3f;
 
         [SerializeField] BuildController build;
 
         VisualElement _root;
         VisualElement[] _slots;
-        Label _selectedName;
+        Label[] _counts;
+        Label _selectedName, _hoverInfo, _toast;
         IPanel _panel;
+        float _toastUntil;
+        ResearchState _research;
 
         // Start, not OnEnable: UIDocument builds its tree in its own OnEnable, and order between components isn't guaranteed.
         void Start()
@@ -24,13 +29,17 @@ namespace Cogworks.View
             _root = root.Q<VisualElement>("hud-root");
             _panel = root.panel;
             _selectedName = root.Q<Label>("selected-name");
+            _hoverInfo = root.Q<Label>("hover-info");
+            _toast = root.Q<Label>("toast");
             var bar = root.Q<VisualElement>("hotbar");
             bar.Clear();
 
-            _slots = new VisualElement[BuildingCatalog.All.Count];
-            for (int i = 0; i < _slots.Length; i++)
+            var slots = BuildController.HotbarSlots;
+            _slots = new VisualElement[slots.Length];
+            _counts = new Label[slots.Length];
+            for (int i = 0; i < slots.Length; i++)
             {
-                var spec = BuildingCatalog.All[i];
+                var spec = slots[i];
                 var slot = new VisualElement { tooltip = spec.DisplayName };
                 slot.AddToClassList("slot");
 
@@ -39,40 +48,86 @@ namespace Cogworks.View
                 icon.style.backgroundImage = new StyleBackground(PlaceholderArt.BuildingSprite(spec));
                 slot.Add(icon);
 
-                var key = new Label((i + 1).ToString()) { pickingMode = PickingMode.Ignore };
+                var key = new Label(((i + 1) % 10).ToString()) { pickingMode = PickingMode.Ignore };
                 key.AddToClassList("slot-key");
                 slot.Add(key);
 
+                var count = new Label { pickingMode = PickingMode.Ignore };
+                count.AddToClassList("slot-count");
+                slot.Add(count);
+
                 int index = i;
-                slot.RegisterCallback<ClickEvent>(_ => build.Select(index));
+                slot.RegisterCallback<ClickEvent>(_ => build.SelectSlot(index));
                 bar.Add(slot);
                 _slots[i] = slot;
+                _counts[i] = count;
             }
 
             build.SelectionChanged += Refresh;
+            build.Message += Toast;
+            _toast.style.display = DisplayStyle.None;
             Refresh();
         }
 
         void OnDestroy()
         {
-            if (build != null) build.SelectionChanged -= Refresh;
+            if (build == null) return;
+            build.SelectionChanged -= Refresh;
+            build.Message -= Toast;
+        }
+
+        public void Toast(string message)
+        {
+            _toast.text = message;
+            _toast.style.display = DisplayStyle.Flex;
+            _toastUntil = Time.unscaledTime + ToastSeconds;
         }
 
         void Update()
         {
+            var bootstrap = GameBootstrap.Instance;
+            var sim = bootstrap != null ? bootstrap.Sim : null;
+            if (_root == null) return;
             // Hidden on the main menu and while a client waits for its world.
-            if (_root != null)
-                _root.style.display = GameBootstrap.Instance?.Sim != null ? DisplayStyle.Flex : DisplayStyle.None;
+            _root.style.display = sim != null ? DisplayStyle.Flex : DisplayStyle.None;
+            if (sim == null) return;
+
+            WatchResearch(sim.World.Research);
+
+            for (int i = 0; i < _slots.Length; i++)
+            {
+                int n = build.Available(BuildController.HotbarSlots[i]);
+                _counts[i].text = n == int.MaxValue ? "" : n.ToString();
+                _slots[i].EnableInClassList(EmptyClass, n == 0);
+            }
+
+            string hover = build.Hovered != null ? Describe.Hover(sim.World, build.Hovered)
+                : build.Selected == null ? Describe.Tile(sim.World, build.CursorTile) : "";
+            _hoverInfo.text = hover;
+            _hoverInfo.style.display = hover.Length > 0 && build.InputEnabled ? DisplayStyle.Flex : DisplayStyle.None;
+
+            if (_toast.style.display == DisplayStyle.Flex && Time.unscaledTime > _toastUntil)
+                _toast.style.display = DisplayStyle.None;
         }
+
+        void WatchResearch(ResearchState research)
+        {
+            if (research == _research) return;
+            if (_research != null) _research.Completed -= OnResearchDone;
+            _research = research;
+            _research.Completed += OnResearchDone;
+        }
+
+        void OnResearchDone(Tech tech) => Toast($"Research complete: {tech.DisplayName}");
 
         void Refresh()
         {
             for (int i = 0; i < _slots.Length; i++)
-                _slots[i].EnableInClassList(SelectedClass, i == build.SelectedIndex);
+                _slots[i].EnableInClassList(SelectedClass, BuildController.HotbarSlots[i] == build.Selected);
             _selectedName.text = build.Selected?.DisplayName ?? "";
         }
 
-        /// <summary>True when the screen-space pointer is over an interactive HUD element.</summary>
+        /// <summary>True when the screen-space pointer is over an interactive element of any game UI panel.</summary>
         public bool IsPointerOverUI(Vector2 screenPosition)
         {
             if (_panel == null) return false;

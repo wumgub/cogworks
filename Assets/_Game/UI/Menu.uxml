@@ -9,6 +9,7 @@
                 <ui:Label text="automate everything" class="subtitle" />
 
                 <ui:Label text="Single player" class="section" />
+                <ui:Toggle name="new-sandbox" label="Sandbox (free building, no costs)" class="toggle" />
                 <ui:VisualElement class="row">
                     <ui:Button name="new-world" text="New World" class="btn btn--primary grow" />
                     <ui:Button name="continue" text="Continue" class="btn grow gap-left" />

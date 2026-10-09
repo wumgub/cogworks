@@ -9,7 +9,7 @@ namespace Cogworks.View
     /// Generates 16x16 pixel-art placeholder sprites at runtime so the game is playable before real art exists.
     /// Swap these for imported sprites later; nothing else depends on how they are made.
     /// </summary>
-    public static class PlaceholderArt
+    public static partial class PlaceholderArt
     {
         public const int PixelsPerUnit = 16;
 
@@ -92,6 +92,7 @@ namespace Cogworks.View
                 px[y * w + x] = edge ? border : bevel ? inner : body;
             }
 
+            DrawGlyph(px, w, h, spec);
             if (spec.Rotatable)
             {
                 // Chevron centered in the footprint, pointing North.
@@ -121,6 +122,11 @@ namespace Cogworks.View
             "assembler" => new Color32(80, 115, 150, 255),
             "shaft" => new Color32(165, 135, 90, 255),
             "hand_crank" => new Color32(120, 85, 60, 255),
+            "gearbox" => new Color32(150, 120, 80, 255),
+            "water_wheel" => new Color32(110, 80, 50, 255),
+            "steam_engine" => new Color32(90, 90, 98, 255),
+            "lab" => new Color32(200, 205, 215, 255),
+            "fast_conveyor" => new Color32(160, 40, 40, 255),
             _ => new Color32(200, 0, 200, 255),
         };
 
@@ -150,10 +156,10 @@ namespace Cogworks.View
         {
             Color32 color = ore switch
             {
-                Ore.Iron => new Color32(184, 196, 208, 255),
-                Ore.Copper => new Color32(216, 122, 58, 255),
-                Ore.Coal => new Color32(34, 34, 38, 255),
-                _ => new Color32(168, 160, 148, 255),
+                Ore.Iron => IronOreColor,
+                Ore.Copper => CopperOreColor,
+                Ore.Coal => CoalColor,
+                _ => StoneColor,
             };
 
             var px = new Color32[PixelsPerUnit * PixelsPerUnit];
@@ -171,7 +177,7 @@ namespace Cogworks.View
             return MakeSprite(px, ore.ToString());
         }
 
-        static Color32 Shade(Color32 c, int delta) => new Color32(
+        internal static Color32 Shade(Color32 c, int delta) => new Color32(
             (byte)Mathf.Clamp(c.r + delta, 0, 255),
             (byte)Mathf.Clamp(c.g + delta, 0, 255),
             (byte)Mathf.Clamp(c.b + delta, 0, 255),
@@ -179,7 +185,7 @@ namespace Cogworks.View
 
         static Sprite MakeSprite(Color32[] pixels, string name) => MakeSprite(pixels, PixelsPerUnit, PixelsPerUnit, name);
 
-        static Sprite MakeSprite(Color32[] pixels, int width, int height, string name)
+        internal static Sprite MakeSprite(Color32[] pixels, int width, int height, string name)
         {
             var tex = new Texture2D(width, height, TextureFormat.RGBA32, false)
             {

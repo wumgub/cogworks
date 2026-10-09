@@ -1,0 +1,46 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="Panels.uss" />
+    <ui:VisualElement name="panels-root" class="panels-root" picking-mode="Ignore">
+
+        <ui:VisualElement name="inventory-panel" class="window window--wide">
+            <ui:VisualElement class="window-header">
+                <ui:Label text="Inventory" class="window-title" />
+                <ui:Button name="inventory-close" text="✕" class="close-btn" />
+            </ui:VisualElement>
+            <ui:VisualElement class="columns">
+                <ui:VisualElement class="column">
+                    <ui:Label text="Items  (click a building to use it)" class="section-label" />
+                    <ui:VisualElement name="inventory-grid" class="grid grid--10" />
+                    <ui:Label text="Crafting queue" class="section-label" />
+                    <ui:VisualElement name="craft-queue" class="queue" />
+                </ui:VisualElement>
+                <ui:VisualElement class="column column--grow">
+                    <ui:Label text="Hand crafting  (click: 1 · shift/right-click: 5)" class="section-label" />
+                    <ui:ScrollView name="craft-list" class="craft-list" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement name="machine-panel" class="window">
+            <ui:VisualElement class="window-header">
+                <ui:Label name="machine-title" class="window-title" />
+                <ui:Button name="machine-close" text="✕" class="close-btn" />
+            </ui:VisualElement>
+            <ui:Label name="machine-status" class="status-line" />
+            <ui:Label name="machine-network" class="network-line" />
+            <ui:VisualElement name="machine-body" class="machine-body" />
+            <ui:Label text="Your inventory  (click: move stack in · shift: move all of that item)" class="section-label" />
+            <ui:VisualElement name="machine-player-grid" class="grid grid--10" />
+        </ui:VisualElement>
+
+        <ui:VisualElement name="research-panel" class="window window--wide">
+            <ui:VisualElement class="window-header">
+                <ui:Label text="Research" class="window-title" />
+                <ui:Button name="research-close" text="✕" class="close-btn" />
+            </ui:VisualElement>
+            <ui:Label text="Build Research Labs and feed them science packs. Click a project to research it." class="hint-line" />
+            <ui:ScrollView name="tech-list" class="tech-list" />
+        </ui:VisualElement>
+
+    </ui:VisualElement>
+</ui:UXML>
