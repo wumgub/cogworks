@@ -106,7 +106,7 @@ namespace Cogworks.Sim.Tests
         public void FourPlayers_RandomCommands_StayInSync()
         {
             var net = new FakeNetwork();
-            net.Host = new HostSession(new Simulation(777), net);
+            net.Host = new HostSession(new Simulation(777, sandbox: true), net);
             var clients = new List<ClientSession>
             {
                 net.Connect(1, latency: 2),
@@ -140,7 +140,7 @@ namespace Cogworks.Sim.Tests
         public void Clients_GetDistinctPlayerIds_AndCommandsAreStampedByHost()
         {
             var net = new FakeNetwork();
-            net.Host = new HostSession(new Simulation(1), net);
+            net.Host = new HostSession(new Simulation(1, sandbox: true), net);
             var a = net.Connect(10, 1);
             var b = net.Connect(11, 1);
             var clients = new List<ClientSession> { a, b };
@@ -164,7 +164,7 @@ namespace Cogworks.Sim.Tests
         public void LateJoiner_ReceivesSnapshot_AndMatchesHost()
         {
             var net = new FakeNetwork();
-            net.Host = new HostSession(new Simulation(5), net);
+            net.Host = new HostSession(new Simulation(5, sandbox: true), net);
             var clients = new List<ClientSession>();
             var rng = new Rng(9);
             for (int i = 0; i < 300; i++)
@@ -193,7 +193,7 @@ namespace Cogworks.Sim.Tests
         public void Desync_IsDetected_AndRepairedByResync()
         {
             var net = new FakeNetwork();
-            net.Host = new HostSession(new Simulation(3), net);
+            net.Host = new HostSession(new Simulation(3, sandbox: true), net);
             var client = net.Connect(7, latency: 1);
             var clients = new List<ClientSession> { client };
             int replaced = 0;
@@ -219,7 +219,7 @@ namespace Cogworks.Sim.Tests
         public void GameFull_RejectsFifthPlayer()
         {
             var net = new FakeNetwork();
-            net.Host = new HostSession(new Simulation(1), net);
+            net.Host = new HostSession(new Simulation(1, sandbox: true), net);
             net.Connect(1, 1);
             net.Connect(2, 1);
             net.Connect(3, 1);
@@ -231,7 +231,7 @@ namespace Cogworks.Sim.Tests
         public void SlotIsReused_AfterDisconnect()
         {
             var net = new FakeNetwork();
-            net.Host = new HostSession(new Simulation(1), net);
+            net.Host = new HostSession(new Simulation(1, sandbox: true), net);
             net.Connect(1, 1);
             net.Host.OnClientDisconnected(1);
             var again = net.Connect(2, 1);
@@ -277,7 +277,7 @@ namespace Cogworks.Sim.Tests
         [Test]
         public void RoundTrip_PreservesHash_AndContinuesIdentically()
         {
-            var a = new Simulation(31337);
+            var a = new Simulation(31337, sandbox: true);
             var rng = new Rng(1);
             for (int i = 0; i < 200; i++)
             {
@@ -302,7 +302,7 @@ namespace Cogworks.Sim.Tests
         [Test]
         public void Loaded_Buildings_AreQueryableByTile()
         {
-            var a = new Simulation(1);
+            var a = new Simulation(1, sandbox: true);
             a.World.Buildings.Place(BuildingCatalog.Assembler, new Int2(10, 10), Direction.North);
             var b = Snapshot.Load(Snapshot.Save(a));
             var found = b.World.Buildings.GetAt(new Int2(12, 12));

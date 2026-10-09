@@ -159,7 +159,7 @@ namespace Cogworks.Sim.Tests
         public void Conveyors_AreWalkable_OtherBuildingsAreSolid()
         {
             foreach (var spec in BuildingCatalog.All)
-                Assert.AreEqual(spec != BuildingCatalog.Conveyor, spec.Solid, spec.Key);
+                Assert.AreEqual(spec.Kind != BuildingKind.Conveyor, spec.Solid, spec.Key);
         }
     }
 
@@ -178,7 +178,7 @@ namespace Cogworks.Sim.Tests
         [Test]
         public void Commands_RunOnScheduledTick_NotBefore()
         {
-            var sim = new Simulation(1);
+            var sim = new Simulation(1, sandbox: true);
             sim.Schedule(5, new PlaceBuildingCommand(BuildingCatalog.Chest.Id, new Int2(0, 0), Direction.North));
 
             for (int i = 0; i < 5; i++) sim.Step();
@@ -190,7 +190,7 @@ namespace Cogworks.Sim.Tests
         [Test]
         public void Commands_InSameTick_RunInScheduledOrder()
         {
-            var sim = new Simulation(1);
+            var sim = new Simulation(1, sandbox: true);
             sim.Schedule(0, new PlaceBuildingCommand(BuildingCatalog.Chest.Id, new Int2(0, 0), Direction.North));
             sim.Schedule(0, new RemoveBuildingCommand(new Int2(0, 0)));
             sim.Step();
@@ -200,7 +200,7 @@ namespace Cogworks.Sim.Tests
         [Test]
         public void Schedule_InThePast_Throws()
         {
-            var sim = new Simulation(1);
+            var sim = new Simulation(1, sandbox: true);
             sim.Step();
             Assert.Throws<System.ArgumentOutOfRangeException>(() =>
                 sim.Schedule(0, new RemoveBuildingCommand(new Int2(0, 0))));
@@ -209,7 +209,7 @@ namespace Cogworks.Sim.Tests
         [Test]
         public void LocalSink_AppliesOnNextStep()
         {
-            var sim = new Simulation(1);
+            var sim = new Simulation(1, sandbox: true);
             new LocalCommandSink(sim).Submit(new PlaceBuildingCommand(BuildingCatalog.Chest.Id, new Int2(0, 0), Direction.North));
             sim.Step();
             Assert.AreEqual(1, sim.World.Buildings.Count);
@@ -232,7 +232,7 @@ namespace Cogworks.Sim.Tests
         {
             ulong RunLog(bool viaCodec)
             {
-                var sim = new Simulation(42);
+                var sim = new Simulation(42, sandbox: true);
                 var log = SampleLog();
                 for (int i = 0; i < log.Length; i++)
                 {
@@ -250,8 +250,8 @@ namespace Cogworks.Sim.Tests
         [Test]
         public void DifferentCommandLogs_ProduceDifferentHashes()
         {
-            var a = new Simulation(42);
-            var b = new Simulation(42);
+            var a = new Simulation(42, sandbox: true);
+            var b = new Simulation(42, sandbox: true);
             a.Schedule(0, new PlaceBuildingCommand(BuildingCatalog.Conveyor.Id, new Int2(0, 0), Direction.North));
             b.Schedule(0, new PlaceBuildingCommand(BuildingCatalog.Conveyor.Id, new Int2(0, 0), Direction.East));
             a.Step();
@@ -262,8 +262,8 @@ namespace Cogworks.Sim.Tests
         [Test]
         public void InvalidCommand_IsNoOp_AndDoesNotChangeHash()
         {
-            var a = new Simulation(42);
-            var b = new Simulation(42);
+            var a = new Simulation(42, sandbox: true);
+            var b = new Simulation(42, sandbox: true);
             b.Schedule(0, new RemoveBuildingCommand(new Int2(10, 10)));
             b.Schedule(0, new PlaceBuildingCommand(9999, new Int2(0, 0), Direction.North));
             a.Step();

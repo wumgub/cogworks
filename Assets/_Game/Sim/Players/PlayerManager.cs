@@ -10,6 +10,12 @@ namespace Cogworks.Sim
 
         // Indexed by player id; ids are small (0 = host / single-player).
         readonly PlayerState[] _players = new PlayerState[MaxPlayers];
+        readonly World _world;
+
+        internal PlayerManager(World world)
+        {
+            _world = world;
+        }
 
         public event Action<PlayerState> Joined;
 
@@ -29,8 +35,14 @@ namespace Cogworks.Sim
         {
             if (id >= MaxPlayers || _players[id] != null) return false;
             _players[id] = new PlayerState(id);
+            if (!_world.Sandbox) _players[id].GiveStarterKit();
             Joined?.Invoke(_players[id]);
             return true;
+        }
+
+        internal void Tick()
+        {
+            foreach (var p in _players) p?.Tick();
         }
 
         internal void Write(BinaryWriter w)

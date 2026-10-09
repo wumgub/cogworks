@@ -12,6 +12,8 @@ namespace Cogworks.Sim
     {
         readonly World _world;
         readonly Dictionary<int, Building> _byId = new Dictionary<int, Building>();
+        // Kept sorted by id: new ids are always the largest, so placement appends.
+        readonly List<Building> _ordered = new List<Building>();
         int _nextId = 1;
 
         /// <summary>Presentation hooks. Raised while a tick runs; never mutate the sim from a handler.</summary>
@@ -26,7 +28,10 @@ namespace Cogworks.Sim
 
         public int Count => _byId.Count;
 
-        public IEnumerable<Building> All => _byId.Values;
+        /// <summary>Buildings in id order, which is also the order the sim updates them in.</summary>
+        public IReadOnlyList<Building> All => _ordered;
+
+        internal List<Building> Ordered => _ordered;
 
         public Building Get(int id) => _byId.TryGetValue(id, out var b) ? b : null;
 
@@ -53,7 +58,22 @@ namespace Cogworks.Sim
                 if (chunk.Occupant[i] != 0) return false;
                 if (chunk.Ore[i] != Ore.None) touchesOre = true;
             }
-            return !spec.RequiresOre || touchesOre;
+            if (spec.RequiresOre && !touchesOre) return false;
+            if (spec.RequiresAdjacentWater && !TouchesWater(origin, size)) return false;
+            return true;
+        }
+
+        bool TouchesWater(Int2 origin, Int2 size)
+        {
+            for (int x = -1; x <= size.X; x++)
+            for (int y = -1; y <= size.Y; y++)
+            {
+                bool inside = x >= 0 && x < size.X && y >= 0 && y < size.Y;
+                bool corner = (x == -1 || x == size.X) && (y == -1 || y == size.Y);
+                if (inside || corner) continue;
+                if (_world.GetTerrain(new Int2(origin.X + x, origin.Y + y)) == TerrainType.Water) return true;
+            }
+            return false;
         }
 
         /// <summary>Places a building, or returns null if the spot is invalid.</summary>
@@ -63,20 +83,42 @@ namespace Cogworks.Sim
 
             var building = new Building(_nextId++, spec, origin, direction);
             _byId.Add(building.Id, building);
+            _ordered.Add(building);
             SetOccupancy(building, building.Id);
+            _world.OnBuildingsChanged(building);
             Placed?.Invoke(building);
             return building;
         }
 
-        public bool Remove(Int2 tile)
+        public bool Remove(Int2 tile) => Remove(tile, null);
+
+        /// <summary>Removes the building covering <paramref name="tile"/>, adding its contents to <paramref name="contents"/>.</summary>
+        internal bool Remove(Int2 tile, List<ItemStack> contents)
         {
             var building = GetAt(tile);
             if (building == null) return false;
 
+            building.Logic.CollectContents(contents ?? new List<ItemStack>());
             SetOccupancy(building, 0);
             _byId.Remove(building.Id);
+            _ordered.RemoveAt(IndexOf(building.Id));
+            _world.OnBuildingsChanged(building);
             Removed?.Invoke(building);
             return true;
+        }
+
+        int IndexOf(int id)
+        {
+            int lo = 0, hi = _ordered.Count - 1;
+            while (lo <= hi)
+            {
+                int mid = (lo + hi) / 2;
+                int midId = _ordered[mid].Id;
+                if (midId == id) return mid;
+                if (midId < id) lo = mid + 1;
+                else hi = mid - 1;
+            }
+            throw new InvalidOperationException($"Building {id} not in order list");
         }
 
         /// <summary>
@@ -92,42 +134,32 @@ namespace Cogworks.Sim
 
             building.Direction = direction;
             _world.GetChunk(World.TileToChunk(building.Origin)).MarkModified();
+            _world.OnBuildingsChanged(building);
             Changed?.Invoke(building);
             return true;
         }
 
         void SetOccupancy(Building building, int id)
         {
-            Int2 size = building.Size;
-            for (int y = 0; y < size.Y; y++)
-            for (int x = 0; x < size.X; x++)
+            foreach (var tile in building.Footprint())
             {
-                var tile = new Int2(building.Origin.X + x, building.Origin.Y + y);
                 var chunk = _world.GetChunk(World.TileToChunk(tile));
                 chunk.Occupant[World.TileToIndex(tile)] = id;
                 chunk.MarkModified();
             }
         }
 
-        /// <summary>Buildings in id order (the order the sim updates them in).</summary>
-        public List<Building> SortedById()
-        {
-            var list = new List<Building>(_byId.Values);
-            list.Sort((a, b) => a.Id.CompareTo(b.Id));
-            return list;
-        }
-
         internal void Write(BinaryWriter w)
         {
             w.Write(_nextId);
-            var list = SortedById();
-            w.Write(list.Count);
-            foreach (var b in list)
+            w.Write(_ordered.Count);
+            foreach (var b in _ordered)
             {
                 w.Write(b.Id);
                 w.Write(b.Spec.Id);
                 w.Write(b.Origin);
                 w.Write((byte)b.Direction);
+                b.Logic.Write(w);
             }
         }
 
@@ -135,6 +167,7 @@ namespace Cogworks.Sim
         internal void Read(BinaryReader r)
         {
             _byId.Clear();
+            _ordered.Clear();
             _nextId = r.ReadInt32();
             int count = r.ReadInt32();
             for (int i = 0; i < count; i++)
@@ -143,19 +176,23 @@ namespace Cogworks.Sim
                 ushort specId = r.ReadUInt16();
                 var spec = BuildingCatalog.Get(specId) ?? throw new InvalidDataException($"Unknown building type {specId}");
                 var b = new Building(id, spec, r.ReadInt2(), (Direction)(r.ReadByte() & 3));
+                b.Logic.Read(r);
                 _byId.Add(id, b);
+                _ordered.Add(b);
             }
+            _ordered.Sort((a, b) => a.Id.CompareTo(b.Id));
         }
 
         internal void AddToHash(ref Fnv64 h)
         {
             h.Add(_nextId);
-            foreach (var b in SortedById())
+            foreach (var b in _ordered)
             {
                 h.Add(b.Id);
                 h.Add(b.Spec.Id);
                 h.Add(b.Origin.Pack());
                 h.Add((byte)b.Direction);
+                b.Logic.AddToHash(ref h);
             }
         }
     }

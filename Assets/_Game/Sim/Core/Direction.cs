@@ -13,6 +13,7 @@ namespace Cogworks.Sim
     {
         public static Direction RotateCw(this Direction d) => (Direction)(((int)d + 1) & 3);
         public static Direction RotateCcw(this Direction d) => (Direction)(((int)d + 3) & 3);
+        public static Direction Opposite(this Direction d) => (Direction)(((int)d + 2) & 3);
 
         public static Int2 ToOffset(this Direction d) => d switch
         {

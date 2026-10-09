@@ -10,7 +10,7 @@ namespace Cogworks.Sim
     public static class Snapshot
     {
         const int Magic = 0x4B574743; // "CGWK"
-        public const int Version = 1;
+        public const int Version = 2;
 
         public static byte[] Save(Simulation sim)
         {

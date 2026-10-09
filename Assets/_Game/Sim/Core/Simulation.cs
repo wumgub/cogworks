@@ -24,9 +24,9 @@ namespace Cogworks.Sim
         /// <summary>The tick that the next <see cref="Step"/> will process.</summary>
         public long Tick { get; private set; }
 
-        public Simulation(uint seed)
+        public Simulation(uint seed, bool sandbox = false)
         {
-            World = new World(seed);
+            World = new World(seed, sandbox);
         }
 
         public void Schedule(long tick, Command command)
@@ -43,13 +43,14 @@ namespace Cogworks.Sim
 
         public void Step()
         {
+            World.CurrentTick = Tick;
             if (_scheduled.TryGetValue(Tick, out var commands))
             {
                 _scheduled.Remove(Tick);
                 foreach (var command in commands) command.Apply(World);
             }
 
-            // Later milestones: update entities (drills, belts, machines, kinetic networks) here.
+            World.Tick();
             Tick++;
             Stepped?.Invoke(Tick - 1);
         }
@@ -57,7 +58,10 @@ namespace Cogworks.Sim
         /// <summary>Restores tick, world and pending commands from <see cref="Write"/> output.</summary>
         internal static Simulation Read(BinaryReader r)
         {
-            var sim = new Simulation(r.ReadUInt32()) { Tick = r.ReadInt64() };
+            uint seed = r.ReadUInt32();
+            bool sandbox = r.ReadBoolean();
+            var sim = new Simulation(seed, sandbox) { Tick = r.ReadInt64() };
+            sim.World.CurrentTick = sim.Tick;
             sim.World.Read(r);
             int tickCount = r.ReadInt32();
             for (int i = 0; i < tickCount; i++)
@@ -72,6 +76,7 @@ namespace Cogworks.Sim
         internal void Write(BinaryWriter w)
         {
             w.Write(World.Seed);
+            w.Write(World.Sandbox);
             w.Write(Tick);
             World.Write(w);
             w.Write(_scheduled.Count);
