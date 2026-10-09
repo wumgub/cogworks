@@ -17,6 +17,13 @@ namespace Cogworks.View
         static Sprite _cog;
         static Sprite _pixel;
 
+        static void ResetItemArt()
+        {
+            ItemSprites.Clear();
+            _cog = null;
+            _pixel = null;
+        }
+
         /// <summary>Icon for any item. Building items reuse the building's art.</summary>
         public static Sprite ItemSprite(ushort itemId)
         {

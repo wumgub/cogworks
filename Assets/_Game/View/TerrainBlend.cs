@@ -25,6 +25,15 @@ namespace Cogworks.View
         static readonly Dictionary<(TerrainType, int), TileBase> Cache = new Dictionary<(TerrainType, int), TileBase>();
         static readonly Dictionary<TerrainType, Color32[]> Source = new Dictionary<TerrainType, Color32[]>();
 
+        // Fast Play mode (domain reload disabled) keeps statics between sessions, but Unity destroys
+        // runtime-created tiles/textures when Play stops, so caches must start empty every session.
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void ResetStatics()
+        {
+            Cache.Clear();
+            Source.Clear();
+        }
+
         public static int Priority(TerrainType t) => System.Array.IndexOf(Order, t);
 
         /// <summary>

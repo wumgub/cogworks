@@ -13,6 +13,20 @@ namespace Cogworks.View
     {
         public const int PixelsPerUnit = 16;
 
+        // Fast Play mode (domain reload disabled) keeps statics between sessions, but Unity destroys
+        // runtime-created tiles/textures when Play stops, so caches must start empty every session.
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void ResetStatics()
+        {
+            TerrainTiles.Clear();
+            OreTiles.Clear();
+            VariantTiles.Clear();
+            BuildingFrameCache.Clear();
+            BuildingSprites.Clear();
+            System.Array.Clear(PlayerSprites, 0, PlayerSprites.Length);
+            ResetItemArt();
+        }
+
         static readonly Dictionary<TerrainType, Tile> TerrainTiles = new Dictionary<TerrainType, Tile>();
         static readonly Dictionary<Ore, Tile> OreTiles = new Dictionary<Ore, Tile>();
         static readonly Dictionary<(string, int), TileBase> VariantTiles = new Dictionary<(string, int), TileBase>();

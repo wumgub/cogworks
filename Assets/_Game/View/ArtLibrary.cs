@@ -35,6 +35,13 @@ namespace Cogworks.View
             }
         }
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void ResetStatics()
+        {
+            _manifest = null;
+            Cache.Clear();
+        }
+
         public static bool Has(string name) => Manifest.ContainsKey(name);
 
         public static int Fps(string name) => Manifest.TryGetValue(name, out var e) ? e.Fps : 0;

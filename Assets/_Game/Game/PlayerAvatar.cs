@@ -15,6 +15,10 @@ namespace Cogworks.Game
         /// <summary>Raised when the avatar this machine controls appears.</summary>
         public static event Action<PlayerAvatar> LocalSpawned;
 
+        // Fast Play mode keeps statics between sessions; drop handlers from the previous session's objects.
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void ResetStatics() => LocalSpawned = null;
+
         public PlayerController Controller => GetComponent<PlayerController>();
 
         public override void OnNetworkSpawn()

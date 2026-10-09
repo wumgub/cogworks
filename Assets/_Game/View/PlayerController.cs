@@ -25,6 +25,10 @@ namespace Cogworks.View
         /// <summary>False while a menu has focus. Applies to every avatar on this machine.</summary>
         public static bool InputEnabled { get; set; } = true;
 
+        // Fast Play mode keeps statics between sessions; don't start a session with input still locked.
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void ResetStatics() => InputEnabled = true;
+
         void Awake()
         {
             GetComponent<SpriteRenderer>().sprite = GameArt.PlayerSprite();
