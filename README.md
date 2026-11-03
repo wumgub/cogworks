@@ -4,7 +4,9 @@
 
 <p align="center">
   <b>A cozy pixel-art factory game with Create-style rotational power and online co-op for up to 4 players.</b><br>
-  Mine ore, smelt it, craft machines, and turn the whole world with water wheels, shafts and gears.
+  Mine ore, smelt it, craft machines, and turn the whole world with water wheels, shafts and gears
+  
+  OBSOLETE.
 </p>
 
 <p align="center">
